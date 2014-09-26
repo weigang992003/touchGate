@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src="/javascripts/libs/jquery.min.js"></script>
+  </head>
+  <body>
+    <script src="/javascripts/libs/highcharts.js"></script>
+    <script src="/javascripts/libs/modules/exporting.js"></script>
+    <script src="/javascripts/bar-dia.js"></script>
+    <script>
+        function showAll() {
+            var startTime = $("#startDateTime option:selected").val();
+            var endTime = $("#endDateTime option:selected").val();
+            var currencyPair = $("#currencyPairName option:selected").val();
+            var urlValue = '/users?startTime=' + startTime + '&endTime=' + endTime + '&currencyPair=' + currencyPair;
+            $.ajax({
+                url: urlValue,
+                type: 'get',
+                dataType: 'json',
+                json: "callback",
+                data: '',
+                success: function (data) {
+                    if (data['status'] === 'success') {
+                        $('#container').height(data['issuer'].length * 100 + 'px');
+                        showResultByCondition($('#container'),data['pays'],data['gets'],data['issuer']);
+                    } else {
+                        $('#container').html('Nothing data between you choose time!');
+                    }
+                },
+                error: function (message) {
+                }
+            });
+        }
+
+        function startTimeSelect(sel) {
+            startTime = sel.value;
+        }
+        function endTimeSelect(sel) {
+            endTime = sel.value;
+        }
+        function currencyPair(sel) {
+            currencyPair = sel.value;
+        }
+
+        function endTimeLoad(sel) {
+            console.log('endTimeLoad');
+            console.log(sel.value);
+        }
+        $(function() {showAll();});
+    </script>
+    <div align="center">
+    <form id="start_date_selector">
+        <label>Start Date:</label>
+        <select id="startDateTime" onchange="startTimeSelect(this)">
+            <% for (var i in startTimeArray) { %>
+                <% if (i == 0) { %>
+                    <option value=<%=startTimeArray[i]%> selected><%=startTimeArray[i]%></option>
+                    <% startTime = startTimeArray[i]; %>
+                <% } else { %>
+                    <option value=<%=startTimeArray[i]%>><%=startTimeArray[i]%></option>
+                <% } %>
+            <% } %>
+        </select>
+        <label>End Date:</label>
+        <select id="endDateTime" onchange="endTimeSelect(this)" onload="endTimeLoad(this)">
+            <% for (var i in endTimeArray) { %>
+                <% if (i == 0) {%>
+                    <option value=<%=endTimeArray[i]%> selected><%=endTimeArray[i]%></option>
+                    <% endTime = endTimeArray[i]; %>
+                <% } else { %>
+                    <option value=<%=endTimeArray[i]%>><%=endTimeArray[i]%></option>
+                <% } %>
+            <% } %>
+        </script>
+        </select>
+        <label>Currency pair:</label>
+        <select id="currencyPairName" onchange="currencyPair(this)">
+            <% for (var i in currencyPairArray) { %>
+                <% if (i == 0) {%>
+                    <option value=<%=currencyPairArray[i]%> selected><%=currencyPairArray[i]%></option>
+                    <% currencyPair = currencyPairArray[i]; %>
+                <% } else { %>
+                    <option value=<%=currencyPairArray[i]%>><%=currencyPairArray[i]%></option>
+                <% } %>
+            <% } %>
+        </select>
+        <button type="button" onclick="showAll()">Show</button>
+    </form>
+    </div>
+    <p></p>
+    <div id="container" style="min-width: 610px; max-width: 800px;height:<%= draw_height%>; margin: 0 auto"></div>
+  </body>
+</html>
