@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
 var issuerToDomain = require('./issuerDomain');
 
-//var connect = mongoose.connect('mongodb://localhost/ripple-info', function(e) {
-var connect = mongoose.connect('mongodb://198.199.114.105/ripple-info', function(e) {
+var connect = mongoose.connect('mongodb://localhost/ripple-info', function(e) {
     if (e) console.log(e.message);
     console.log('connect success')
 });
