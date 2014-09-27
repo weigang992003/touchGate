@@ -23,12 +23,10 @@ exports.getSupportCurrency = function(callback) {
     var query = CurrencyInfo.distinct('currency');
     query.exec(function(err, result) {
         if (err) {
-            console.log("getSupportCurrency failed");
+            console.log(err);
             return;
         }
         if (callback) {
-            console.log("in getSupportCurrency(callback)");
-            console.log(result);
             callback(result);
         }
     });
@@ -46,7 +44,6 @@ exports.getIssuerByCurrency = function(currency, callback) {
         if (callback) {
             var issuers = result['issuers'];
             callback(result);
-            console.log(issuers);
         }
     });
 }

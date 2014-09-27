@@ -1,6 +1,7 @@
 var WebSocket = require('ws');
 var _ = require('underscore');
-var tfmjs = require('./the-future-manager.js');
+
+var wsAddr = 'ws://localhost:7890';
 
 function WSBookUtil() {
     this.ws;
@@ -12,22 +13,20 @@ WSBookUtil.prototype.connect = function(callback) {
     var self = this;
     var ws = self.ws;
 
-    tfmjs.getEnv(function(result) {
-        ws = new WebSocket(result.wspm);
-        ws.on('open', function() {
-            self.wsConnected = true;
-            self.ws = ws;
-            if (callback) {
-                callback();
-            }
-        });
+    ws = new WebSocket(wsAddr);
+    ws.on('open', function() {
+        self.wsConnected = true;
+        self.ws = ws;
+        if (callback) {
+            callback();
+        }
+    });
 
-        ws.on('close', function() {
-            self.wsConnected = false;
-            ws.close();
-            self.connect();
-        });
-    })
+    ws.on('close', function() {
+        self.wsConnected = false;
+        ws.close();
+        self.connect();
+    });
 };
 
 WSBookUtil.prototype.exeCmd = function(cmd, callback) {
