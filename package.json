@@ -15,6 +15,9 @@
     "ejs": "~0.8.5",
     "mongoose": "~3.8.16",
     "stylus": "0.42.3",
-    "ripple-lib": "~0.8.2"
+    "ripple-lib": "~0.8.2",
+    "ws": "~0.4.32",
+    "mathjs": "~1.0.1",
+    "underscore": "~1.7.0"
   }
 }

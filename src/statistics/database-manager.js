@@ -1,10 +1,13 @@
 var mongoose = require('mongoose');
 var issuerToDomain = require('./issuerDomain');
 
+var connect = mongoose.createConnection('mongodb://localhost/ripple-info');
+/*
 var connect = mongoose.connect('mongodb://localhost/ripple-info', function(e) {
     if (e) console.log(e.message);
-    console.log('connect success')
+    console.log('database-manager connect success')
 });
+*/
 
 // store all domain
 var issuerDomainMap = {};
@@ -27,7 +30,7 @@ var tradeDataSchema = mongoose.Schema({
     collection: 'reallyTradeData'
 });
 
-var TradeData = mongoose.model('tradeData', tradeDataSchema);
+var TradeData = connect.model('tradeData', tradeDataSchema);
 
 exports.initialDrawDataByValue = function(startTime, endTime, currency, callback) {
     var issuerCategories = new Array();

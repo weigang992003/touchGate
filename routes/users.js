@@ -1,6 +1,6 @@
 var express = require('express');
-var dailyData = require('../src/dailyData');
-var dbManager = require('../src/database-manager');
+var dailyData = require('../src/statistics/dailyData');
+var dbManager = require('../src/statistics/database-manager');
 var router = express.Router();
 
 /* GET users listing. */
