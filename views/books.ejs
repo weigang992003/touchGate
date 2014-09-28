@@ -78,7 +78,7 @@
 
             var qualityNew = getsValue/paysValue;
             var quality = bookArray[i]['quality'];
-            var offerCreateData = 'paysCurrency="'+getsCurrency+'"&paysIssuer="'+getsIssuer+'"&paysValue='+getsValue+'&getsCurrency="'+paysCurrency+'"&getsIssuer="'+paysIssuer+'"&getsValue='+paysValue+'&quality='+qualityNew;
+            var offerCreateData = 'paysCurrency='+getsCurrency+'&paysIssuer='+getsIssuer+'&paysValue='+getsValue+'&getsCurrency='+paysCurrency+'&getsIssuer='+paysIssuer+'&getsValue='+paysValue+'&quality='+qualityNew;
 
             var item = '<tr value='+offerCreateData+' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> '+paysValue+'</td><td title="'+getsIssuer+'">'+getsValue+'</td><td>'+quality+'</td></tr>';
             $("#bookTable").append(item);
