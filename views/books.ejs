@@ -48,7 +48,7 @@
         }
     }
 
-    function getBooksResult(args) {
+    function getBooksResult() {
         var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize();
         $.ajax({
             url: '/books/getbooks',
@@ -94,6 +94,7 @@
                 allData = data['all'];
                 initialGetsCurrency();
                 initialPaysCurrency();
+                getBooksResult();
             },
             error: function(message) {}
         });
@@ -135,25 +136,6 @@
     <input name="" type="button" value="Submit" onClick="getBooksResult()" />
     <h2>Book list</h2>
     <div id="bookList">
-            <!--
-        <table id="bookTable" class="reference">
-            <tr>
-                <th>Pays value</th>
-                <th>Gets value</th>
-                <th>Quality</th>
-            </tr>
-            <div id="bookTableContent">
-                <tr title="issuer">
-                    <td title="issuerpays"><a href='/books/offercreate?paysCurrency="CNY"&paysIssuer="aaaaaaaa"&paysValue=100' />row 1, cell 1</td>
-                    <td value="test" onclick="alert(this.val())">row 1, cell 2</td>
-                </tr>
-                <tr>
-                    <td>row 2, cell 1</td>
-                    <td>row 2, cell 2</td>
-                </tr>
-            </div>
-        </table>
-            -->
     </div>
 </body>
 
