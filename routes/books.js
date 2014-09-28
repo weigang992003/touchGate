@@ -97,8 +97,8 @@ router.get('/offercreate', function(req, res) {
     var paysCurrency = req.query.paysCurrency;
     var paysIssuer = req.query.paysIssuer;
     var paysValue = req.query.paysValue;
-    var getsCurrency = req.query.getCurrency;
-    var getsIssuer = req.query.getIssuer;
+    var getsCurrency = req.query.getsCurrency;
+    var getsIssuer = req.query.getsIssuer;
     var getsValue = req.query.getsValue;
     var quality = req.query.quality;
 

@@ -84,9 +84,7 @@ OfferService.prototype.createOffer = function(taker_pays, taker_gets, logger, cr
         return;
     }
 
-    console.log("create offer 2");
     tx.offerCreate(accountId, taker_pays, taker_gets);
-    console.log("create offer 3");
     tx.on("success", function(res) {
         self.getOffers(callback);
     });
