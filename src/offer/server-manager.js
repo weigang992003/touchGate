@@ -104,6 +104,9 @@ function makeSameCurrencyProfit(order, callback) {
 */
     var cmd = buildCmd(order);
 
+    // need login ok
+    return
+
     offerService.createSCPOffer(order_taker_pays.to_json(), order_taker_gets.to_json(), cmd, null, callback);
 }
 
