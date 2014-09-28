@@ -1,8 +1,7 @@
 var WebSocket = require('ws');
 var _ = require('underscore');
 
-var wsAddr = 'ws://198.199.114.105:7890';
-//var wsAddr = 'ws://localhost:7890';
+var wsAddr = 'ws://localhost:7890';
 
 function WSBookUtil() {
     this.ws;

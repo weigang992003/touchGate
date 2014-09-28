@@ -1,13 +1,6 @@
 var mongoose = require('mongoose');
 
-//var connect = mongoose.connect('mongodb://localhost/currencyInfo', function(e) {
-var connect = mongoose.createConnection('mongodb://198.199.114.105/account-info');
-/*
-var connect = mongoose.connect('mongodb://198.199.114.105/account-info', function(e) {
-    if (e) console.log(e.message);
-    console.log('currency info connect success')
-});
-*/
+var connect = mongoose.createConnection('mongodb://localhost/account-info');
 
 var currencyInfoSchema = mongoose.Schema({
     currency: String,

@@ -76,11 +76,34 @@
             var getsCurrency = bookArray[i]['getsCurrency'];
             var getsValue = bookArray[i]['getsValue'];
 
+            var qualityNew = getsValue/paysValue;
             var quality = bookArray[i]['quality'];
+            var offerCreateData = 'paysCurrency="'+getsCurrency+'"&paysIssuer="'+getsIssuer+'"&paysValue='+getsValue+'&getsCurrency="'+paysCurrency+'"&getsIssuer="'+paysIssuer+'"&getsValue='+paysValue+'&quality='+qualityNew;
 
-            var item = '<tr><td title="' + paysIssuer + '"> '+paysValue+'</td><td title="'+getsIssuer+'">'+getsValue+'</td><td>'+quality+'</td></tr>';
+            var item = '<tr value='+offerCreateData+' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> '+paysValue+'</td><td title="'+getsIssuer+'">'+getsValue+'</td><td>'+quality+'</td></tr>';
             $("#bookTable").append(item);
         }
+    }
+    function tableItemClick(args) {
+        var urlData = $(args).attr('value');
+        if (confirm(getOfferMessage(urlData))){
+            $.ajax({
+                url: '/books/offercreate',
+                type: 'get',
+                dataType: 'json',
+                json: "callback",
+                data: urlData,
+                success: function(data) {
+                    alert(JSON.stringify(data['status']));
+                },
+                error: function(message) {}
+            });
+        }
+    }
+
+    function getOfferMessage(rawData) {
+        var result = "";
+        return rawData;
     }
     $(function() {
         $.ajax({

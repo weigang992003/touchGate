@@ -1,6 +1,7 @@
 var currencyInfo = require('../src/offer/currencyInfo');
 var WSBookUtil = require('../src/offer/web-socket-book-util').WSBookUtil;
 var AmountUtil = require('../src/offer/amount-util').AmountUtil;
+var ServerManager = require('../src/offer/server-manager');
 var express = require('express');
 var router = express.Router();
 
@@ -45,16 +46,18 @@ router.get('/getbooks', function(req, res) {
     wsbu.exeCmd({
         "cmd": "book",
         "params": {
-            "pays_currency":paysCurrencyArray,
-            "pays_issuer":paysIssuersArray,
-            "gets_currency":getsCurrencyArray,
-            "gets_issuer":getsIssuersArray
+            "pays_currency": paysCurrencyArray,
+            "pays_issuer": paysIssuersArray,
+            "gets_currency": getsCurrencyArray,
+            "gets_issuer": getsIssuersArray
         },
         "limit": 1,
         "filter": 0,
         "cache": 1
     }, function(orders) {
-        res.json({books:formatOrder(orders)});
+        res.json({
+            books: formatOrder(orders)
+        });
     });
 
 });
@@ -94,16 +97,28 @@ router.get('/offercreate', function(req, res) {
     var paysCurrency = req.query.paysCurrency;
     var paysIssuer = req.query.paysIssuer;
     var paysValue = req.query.paysValue;
-    var getCurrency = req.query.getCurrency;
-    var getIssuer = req.query.getIssuer;
+    var getsCurrency = req.query.getCurrency;
+    var getsIssuer = req.query.getIssuer;
     var getsValue = req.query.getsValue;
     var quality = req.query.quality;
 
-    console.log(paysCurrency);
-    console.log(paysIssuer);
-    console.log(paysValue);
-    res.render('books', {
-        title: 'offercreate'
+    var takerPays = {
+        "currency": paysCurrency,
+        "value": paysValue.toString(),
+        "issuer": paysIssuer
+    };
+    var takerGets = {
+        "currency": getsCurrency,
+        "value": getsValue.toString(),
+        "issuer": getsIssuer
+    };
+
+    ServerManager.makeOffer(takerPays, takerGets, function(result) {
+        console.log("offer create end");
+        console.log(result);
+        res.json({
+            status: result,
+        });
     });
 });
 
