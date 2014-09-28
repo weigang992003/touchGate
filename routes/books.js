@@ -1,9 +1,11 @@
 var currencyInfo = require('../src/offer/currencyInfo');
 var WSBookUtil = require('../src/offer/web-socket-book-util').WSBookUtil;
+var AmountUtil = require('../src/offer/amount-util').AmountUtil;
 var express = require('express');
 var router = express.Router();
 
 var wsbu = new WSBookUtil();
+var au = new AmountUtil();
 
 router.get('/', function(req, res) {
     res.render('books', {
@@ -17,34 +19,65 @@ router.get('/getbooks', function(req, res) {
     var getsCurrency = req.query.currencyGetsSelector;
     var paysCurrency = req.query.currencyPaysSelector;
 
-    console.log(getsIssuers);
-    console.log(paysIssuers);
-    console.log(getsCurrency);
-
     var paysCurrencyArray = new Array();
+    var paysIssuersArray = new Array();
     var getsCurrencyArray = new Array();
+    var getsIssuersArray = new Array();
     paysCurrencyArray.push(paysCurrency);
     getsCurrencyArray.push(getsCurrency);
+
+    if (typeof(paysIssuers) === 'string') {
+        paysIssuersArray.push(paysIssuers);
+    } else {
+        paysIssuersArray = paysIssuers;
+    }
+    if (typeof(getsIssuers) === 'string') {
+        getsIssuersArray.push(getsIssuers);
+    } else {
+        getsIssuersArray = getsIssuers;
+    }
+
+    console.log(getsIssuersArray);
+    console.log(paysIssuersArray);
+    console.log(getsCurrencyArray);
+    console.log(paysCurrencyArray);
+
     wsbu.exeCmd({
         "cmd": "book",
         "params": {
             "pays_currency":paysCurrencyArray,
-            "pays_issuer":paysIssuers,
+            "pays_issuer":paysIssuersArray,
             "gets_currency":getsCurrencyArray,
-            "gets_issuer":getsIssuers
+            "gets_issuer":getsIssuersArray
         },
         "limit": 1,
         "filter": 0,
         "cache": 1
     }, function(orders) {
-        console.log(orders);
+        res.json({books:formatOrder(orders)});
     });
-    console.log(paysCurrency);
 
-    res.render('books', {
-        title: 'getbooks'
-    });
 });
+
+function formatOrder(rawOrders) {
+    var len = rawOrders.length;
+    var ret = new Array();
+    for (var i = 0; i < len; i++) {
+        var item = {};
+        item['paysCurrency'] = au.getCurrency(rawOrders[i]['TakerPays']);
+        item['paysIssuer'] = au.getIssuer(rawOrders[i]['TakerPays']);
+        item['paysValue'] = au.getValue(rawOrders[i]['TakerPays']);
+
+        item['getsCurrency'] = au.getCurrency(rawOrders[i]['TakerGets']);
+        item['getsIssuer'] = au.getIssuer(rawOrders[i]['TakerGets']);
+        item['getsValue'] = au.getValue(rawOrders[i]['TakerGets']);
+
+        item['quality'] = rawOrders[i]['quality'];
+
+        ret.push(item);
+    };
+    return ret;
+}
 
 router.get('/getcurrencies', function(req, res) {
     currencyInfo.getSupportCurrency(function(result) {
@@ -58,6 +91,17 @@ router.get('/getcurrencies', function(req, res) {
 });
 
 router.get('/offercreate', function(req, res) {
+    var paysCurrency = req.query.paysCurrency;
+    var paysIssuer = req.query.paysIssuer;
+    var paysValue = req.query.paysValue;
+    var getCurrency = req.query.getCurrency;
+    var getIssuer = req.query.getIssuer;
+    var getsValue = req.query.getsValue;
+    var quality = req.query.quality;
+
+    console.log(paysCurrency);
+    console.log(paysIssuer);
+    console.log(paysValue);
     res.render('books', {
         title: 'offercreate'
     });

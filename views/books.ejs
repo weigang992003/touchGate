@@ -6,115 +6,154 @@
         <%=title %>
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/tablestyle.css' />
     <script type="text/javascript" src="/javascripts/libs/jquery.min.js"></script>
 </head>
 
 <body>
     <script type="text/javascript">
-        var allData = {};
-        var currencyArray = [];
-        function initialPaysCurrency() {
-            document.paysBookArgs.currencyPaysSelector.options = null;
-            console.log(currencyArray);
+    var allData = {};
+    var currencyArray = [];
+
+    function initialPaysCurrency() {
+        document.paysBookArgs.currencyPaysSelector.options = null;
+        console.log(currencyArray);
+        $("#paysIssuerGroup").remove();
+        $("#paysBookArgs").append('<div id="paysIssuerGroup"> </div>');
+        for (var i = currencyArray.length - 1; i >= 0; i--) {
+            var op = new Option(currencyArray[i], currencyArray[i]);
+            document.paysBookArgs.currencyPaysSelector.appendChild(op);
+            if (op.selected) {
+                var issuers = allData[currencyArray[i]];
+                for (var j = issuers.length - 1; j >= 0; j--) {
+                    $("#paysIssuerGroup").append('<br /><input type="checkbox" name="paysIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
+                };
+            }
+        }
+    }
+
+    function initialGetsCurrency() {
+        document.getsBookArgs.currencyGetsSelector.options = null;
+        $("#getsIssuerGroup").remove();
+        $("#getsBookArgs").append('<div id="getsIssuerGroup"> </div>');
+        for (var i = currencyArray.length - 1; i >= 0; i--) {
+            var op = new Option(currencyArray[i], currencyArray[i]);
+            document.getsBookArgs.currencyGetsSelector.appendChild(op);
+            if (op.selected) {
+                var issuers = allData[currencyArray[i]];
+                for (var j = issuers.length - 1; j >= 0; j--) {
+                    $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
+                };
+            }
+        }
+    }
+
+    function getBooksResult(args) {
+        var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize();
+        $.ajax({
+            url: '/books/getbooks',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            data: formData,
+            success: function(data) {
+                console.log(data['books']);
+                initialBookList(data['books']);
+            },
+            error: function(message) {}
+        });
+    }
+
+    function initialBookList(bookArray) {
+        $("#bookTable").remove();
+        $("#bookList").append('<table id="bookTable" class="reference"><tr><th>Pays value</th><th>Gets value</th><th>Quality</th></tr>');
+        for (var i = bookArray.length - 1; i >= 0; i--) {
+            var paysIssuer = bookArray[i]['paysIssuer'];
+            var paysCurrency = bookArray[i]['paysCurrency'];
+            var paysValue = bookArray[i]['paysValue'];
+
+            var getsIssuer = bookArray[i]['getsIssuer'];
+            var getsCurrency = bookArray[i]['getsCurrency'];
+            var getsValue = bookArray[i]['getsValue'];
+
+            var quality = bookArray[i]['quality'];
+
+            var item = '<tr><td title="' + paysIssuer + '"> '+paysValue+'</td><td title="'+getsIssuer+'">'+getsValue+'</td><td>'+quality+'</td></tr>';
+            $("#bookTable").append(item);
+        }
+    }
+    $(function() {
+        $.ajax({
+            url: '/books/getcurrencies',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            data: '',
+            success: function(data) {
+                currencyArray = data['currencies'];
+                allData = data['all'];
+                initialGetsCurrency();
+                initialPaysCurrency();
+            },
+            error: function(message) {}
+        });
+        $("#currencyPaysSelector").change(function() {
+            var currency = $(this).val();
             $("#paysIssuerGroup").remove();
             $("#paysBookArgs").append('<div id="paysIssuerGroup"> </div>');
-            for (var i = currencyArray.length - 1; i >= 0; i--) {
-                var op = new Option(currencyArray[i],currencyArray[i]);
-                document.paysBookArgs.currencyPaysSelector.appendChild(op);
-                if (op.selected) {
-                    var issuers = allData[currencyArray[i]];
-                    for (var j = issuers.length - 1; j >= 0; j--) {
-                        $("#paysIssuerGroup").append('<br /><input type="checkbox" name="paysIssuer" value='+ issuers[j] +' checked="checked" />' + issuers[j]);
-                    };
-                }
-            }
-        }
-        function initialGetsCurrency() {
-            document.getsBookArgs.currencyGetsSelector.options = null;
+            var issuers = allData[currency];
+            for (var j = issuers.length - 1; j >= 0; j--) {
+                $("#paysIssuerGroup").append('<br /><input type="checkbox" name="paysIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
+            };
+        });
+        $("#currencyGetsSelector").change(function() {
+            var currency = $(this).val();
             $("#getsIssuerGroup").remove();
             $("#getsBookArgs").append('<div id="getsIssuerGroup"> </div>');
-            for (var i = currencyArray.length - 1; i >= 0; i--) {
-                var op = new Option(currencyArray[i],currencyArray[i]);
-                document.getsBookArgs.currencyGetsSelector.appendChild(op);
-                if (op.selected) {
-                    var issuers = allData[currencyArray[i]];
-                    for (var j = issuers.length - 1; j >= 0; j--) {
-                        $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value='+ issuers[j] +' checked="checked" />' + issuers[j]);
-                    };
-                }
-            }
-        }
-        function getBooksResult(args) {
-            var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize();
-            $.ajax({
-                url: '/books/getbooks',
-                type: 'get',
-                dataType: 'json',
-                json: "callback",
-                data: formData,
-                success: function (data) {
-                    console.log(data);
-                },
-                error: function (message) {
-                }
-            });
-        }
-        $(function(){
-            $.ajax({
-                url: '/books/getcurrencies',
-                type: 'get',
-                dataType: 'json',
-                json: "callback",
-                data: '',
-                success: function (data) {
-                    currencyArray = data['currencies'];
-                    allData = data['all'];
-                    initialGetsCurrency();
-                    initialPaysCurrency();
-                },
-                error: function (message) {
-                }
-            });
-            $("#currencyPaysSelector").change(function(){
-                var currency = $(this).val();
-                $("#paysIssuerGroup").remove();
-                $("#paysBookArgs").append('<div id="paysIssuerGroup"> </div>');
-                var issuers = allData[currency];
-                for (var j = issuers.length - 1; j >= 0; j--) {
-                    $("#paysIssuerGroup").append('<br /><input type="checkbox" name="paysIssuer" value='+ issuers[j] +' checked="checked" />' + issuers[j]);
-                };
-            });
-            $("#currencyGetsSelector").change(function(){
-                var currency = $(this).val();
-                $("#getsIssuerGroup").remove();
-                $("#getsBookArgs").append('<div id="getsIssuerGroup"> </div>');
-                var issuers = allData[currency];
-                for (var j = issuers.length - 1; j >= 0; j--) {
-                    $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value='+ issuers[j] +' checked="checked" />' + issuers[j]);
-                };
-            });
-
+            var issuers = allData[currency];
+            for (var j = issuers.length - 1; j >= 0; j--) {
+                $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
+            };
         });
 
+    });
     </script>
     <div>
-    <form id="paysBookArgs" name="paysBookArgs">
-        <label>Currency pays:</label>
-        <select id="currencyPaysSelector" name="currencyPaysSelector">
-        </select>
-    </form>
-    <br />
-    <form id="getsBookArgs" name="getsBookArgs">
-        <label>Currency gets:</label>
-        <select id="currencyGetsSelector" name="currencyGetsSelector">
-        </select>
-    </form>
+        <form id="paysBookArgs" name="paysBookArgs">
+            <label>Currency pays:</label>
+            <select id="currencyPaysSelector" name="currencyPaysSelector">
+            </select>
+        </form>
+        <br />
+        <form id="getsBookArgs" name="getsBookArgs">
+            <label>Currency gets:</label>
+            <select id="currencyGetsSelector" name="currencyGetsSelector">
+            </select>
+        </form>
     </div>
     <br />
     <input name="" type="button" value="Submit" onClick="getBooksResult()" />
     <h2>Book list</h2>
     <div id="bookList">
-        <div><a href='/books/offercreate?pays=abc&gets=aaa'/>test</div>
+            <!--
+        <table id="bookTable" class="reference">
+            <tr>
+                <th>Pays value</th>
+                <th>Gets value</th>
+                <th>Quality</th>
+            </tr>
+            <div id="bookTableContent">
+                <tr title="issuer">
+                    <td title="issuerpays"><a href='/books/offercreate?paysCurrency="CNY"&paysIssuer="aaaaaaaa"&paysValue=100' />row 1, cell 1</td>
+                    <td value="test" onclick="alert(this.val())">row 1, cell 2</td>
+                </tr>
+                <tr>
+                    <td>row 2, cell 1</td>
+                    <td>row 2, cell 2</td>
+                </tr>
+            </div>
+        </table>
+            -->
     </div>
 </body>
 
