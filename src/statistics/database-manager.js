@@ -1,13 +1,8 @@
 var mongoose = require('mongoose');
 var issuerToDomain = require('./issuerDomain');
+var config = require('../config');
 
-var connect = mongoose.createConnection('mongodb://localhost/ripple-info');
-/*
-var connect = mongoose.connect('mongodb://localhost/ripple-info', function(e) {
-    if (e) console.log(e.message);
-    console.log('database-manager connect success')
-});
-*/
+var connect = mongoose.createConnection(config.dbServer['rippleInfo']);
 
 // store all domain
 var issuerDomainMap = {};

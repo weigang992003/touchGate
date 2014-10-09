@@ -1,8 +1,8 @@
 var math = require('mathjs');
 var _ = require('underscore');
-var drops = require('./config.js').drops;
+var drops = require('../config.js').drops;
 var Amount = require('ripple-lib').Amount;
-var profit_min_volumns = require('./config.js').profit_min_volumns;
+var profit_min_volumns = require('../config.js').profit_min_volumns;
 
 
 function AmountUtil() {}

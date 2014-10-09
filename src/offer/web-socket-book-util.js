@@ -1,7 +1,8 @@
 var WebSocket = require('ws');
 var _ = require('underscore');
+var config = require('../config');
 
-var wsAddr = 'ws://localhost:7890';
+var wsAddr = config.orderSocket.orderServer;
 
 function WSBookUtil() {
     this.ws;

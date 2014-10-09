@@ -3,7 +3,7 @@ var events = require('events');
 var OfferService = require('./offer-service').OfferService;
 var RemoteService = require('./remote-service');
 var AmountUtil = require('./amount-util.js').AmountUtil;
-var config = require('./config.js');
+var config = require('../config.js');
 var crypto = require('./crypto-util.js');
 var tfmjs = require('./the-future-manager.js');
 
@@ -44,7 +44,7 @@ function remoteConnect(env) {
         remote.connect(function() {
             offerService = new OfferService(remote, account, secret);
             console.log("server connect success");
-            offerService.getOffers();
+            //offerService.getOffers();
 
             /*
             tls = new TrustLineService(remote, account);
@@ -105,6 +105,7 @@ function makeSameCurrencyProfit(order, callback) {
     var cmd = buildCmd(order);
 
     // need login ok
+    console.log("need login which in server-manager");
     return
 
     offerService.createSCPOffer(order_taker_pays.to_json(), order_taker_gets.to_json(), cmd, null, callback);

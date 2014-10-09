@@ -100,6 +100,16 @@ exports.currencies_no = {
     "BTC": 11
 }
 
+exports.dbServer = {
+    accountInfo:'mongodb://localhost/account-info',
+    rippleInfo:'mongodb://localhost/ripple-info',
+    theFuture:'mongodb://localhost/the-future'
+}
+
+exports.orderSocket = {
+    orderServer: 'ws://localhost:7890'
+}
+
 exports.mother = -1;
 exports.newAccount = 0;
 exports.tradeFailed = 1;

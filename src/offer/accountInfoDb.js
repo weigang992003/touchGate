@@ -1,6 +1,20 @@
 var mongoose = require('mongoose');
+var config = require('../config');
 
-var connect = mongoose.createConnection('mongodb://localhost/account-info');
+var dbConnect = mongoose.createConnection(config.dbServer['accountInfo']);
+
+var txHistorySchema = mongoose.Schema({
+    __v: Number,
+    hashs: Array,
+    account: String,
+    i_gets_currency: String,
+    i_gets_value: Number,
+    i_pays_currency: String,
+    i_pays_value: Number,
+    price: Number
+}, {
+    collection: 'txHisotry'
+});
 
 var currencyInfoSchema = mongoose.Schema({
     currency: String,
@@ -10,7 +24,8 @@ var currencyInfoSchema = mongoose.Schema({
     collection: 'currencyInfo'
 });
 
-var CurrencyInfo = connect.model('currencyInfo', currencyInfoSchema);
+var CurrencyInfo = dbConnect.model('currencyInfo', currencyInfoSchema);
+var TxHistory = dbConnect.model('TxHistory', txHistorySchema);
 
 exports.getSupportCurrency = function(callback) {
     var query = CurrencyInfo.distinct('currency');
@@ -58,6 +73,17 @@ exports.getCurrencyInfo = function(callback) {
     });
 }
 
+exports.getAllTxHistoryData = function(callback) {
+    TxHistory.find({}, function(err, result) {
+        if (err) {
+            console.log("find tx history error: " + err);
+            callback('error');
+        } else {
+            callback(result);
+        }
+    });
+}
+
 /*
 var self = this
 this.getSupportCurrency(function(result) {
@@ -66,4 +92,10 @@ this.getSupportCurrency(function(result) {
         console.log("getIssuerByCurrency");
     });
 });
+
+this.getAllTxHistoryData(function(ret) {
+    console.log("getAllTxHistoryData test");
+    console.log(ret);
+});
+
 */

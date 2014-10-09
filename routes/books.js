@@ -1,7 +1,8 @@
-var currencyInfo = require('../src/offer/currencyInfo');
+var currencyInfo = require('../src/offer/accountInfoDb');
 var WSBookUtil = require('../src/offer/web-socket-book-util').WSBookUtil;
 var AmountUtil = require('../src/offer/amount-util').AmountUtil;
 var ServerManager = require('../src/offer/server-manager');
+var txHistory = require('../src/offer/txHistoryProcess');
 var express = require('express');
 var router = express.Router();
 
@@ -122,4 +123,11 @@ router.get('/offercreate', function(req, res) {
     });
 });
 
+router.get('/txhistory', function(req, res) {
+    txHistory.getTableData(function(ret) {
+        res.json({
+            result: ret
+        });
+    });
+});
 module.exports = router;

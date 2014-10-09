@@ -70,12 +70,13 @@ function findSameBookOffer(offers, pays, gets) {
 }
 
 OfferService.prototype.createOffer = function(taker_pays, taker_gets, logger, createFO, callback) {
-    console.log("create offer 1");
     var self = this;
     var remote = this.remote;
     var secret = this.secret;
     var accountId = this.accountId;
     var offers = this.offers;
+    console.log("create Offer return need check taker_pays: " + taker_pays + ', taker_gets: ' + taker_gets);
+    return;
 
     var tx = remote.transaction();
     if (secret) {

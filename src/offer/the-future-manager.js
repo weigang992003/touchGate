@@ -1,7 +1,8 @@
 var _ = require('underscore');
 var mongoose = require('mongoose');
+var config = require('../config');
 
-var tf = mongoose.createConnection('mongodb://localhost/the-future');
+var tf = mongoose.createConnection(config.dbServer['theFuture']);
 
 var cryptoSchema = mongoose.Schema({
     key: String,

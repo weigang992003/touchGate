@@ -76,17 +76,45 @@
             var getsCurrency = bookArray[i]['getsCurrency'];
             var getsValue = bookArray[i]['getsValue'];
 
-            var qualityNew = getsValue/paysValue;
+            var qualityNew = getsValue / paysValue;
             var quality = bookArray[i]['quality'];
-            var offerCreateData = 'paysCurrency='+getsCurrency+'&paysIssuer='+getsIssuer+'&paysValue='+getsValue+'&getsCurrency='+paysCurrency+'&getsIssuer='+paysIssuer+'&getsValue='+paysValue+'&quality='+qualityNew;
+            var offerCreateData = 'paysCurrency=' + getsCurrency + '&paysIssuer=' + getsIssuer + '&paysValue=' + getsValue + '&getsCurrency=' + paysCurrency + '&getsIssuer=' + paysIssuer + '&getsValue=' + paysValue + '&quality=' + qualityNew;
 
-            var item = '<tr value='+offerCreateData+' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> '+paysValue+'</td><td title="'+getsIssuer+'">'+getsValue+'</td><td>'+quality+'</td></tr>';
+            var item = '<tr value=' + offerCreateData + ' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> ' + paysValue + '</td><td title="' + getsIssuer + '">' + getsValue + '</td><td>' + quality + '</td></tr>';
             $("#bookTable").append(item);
         }
     }
+
+    function getTxHistoryData() {
+        console.log("getTxHistoryData()");
+        $.ajax({
+            url: '/books/txhistory',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            success: function(data) {
+                initialTxHistory(data['result']);
+            },
+            error: function(message) {
+                console.log("getTxHistoryData() failed" + message);
+            }
+        });
+
+    }
+
+    function initialTxHistory(historyData) {
+        console.log("initialTxHistory(historyData)");
+        $("#txHistoryTable").remove();
+        $("#txHistoryList").append('<table id="txHistoryTable" class="reference"><tr><th>P/G currency</th><th>Pays value</th><th>Pays price</th><th>Gets value</th><th>Gets price</th><th>PaysInc</th><th>ProfitRate</th><th>Profit</th></tr>');
+        for (var i = historyData.length - 1; i >= 0; i--) {
+            var item = '<tr><td>' + historyData[i]['paysCurrencyA'] + '/' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td>' + historyData[i]['getsValueB'] +'</td><td>' + historyData[i]['priceB'] + '</td><td>' + historyData[i]['paysInc'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>'+historyData[i]['paysCurrencyA']+':'+historyData[i]['profit']+'</td></tr>';
+            $("#txHistoryTable").append(item);
+        };
+    }
+
     function tableItemClick(args) {
         var urlData = $(args).attr('value');
-        if (confirm(getOfferMessage(urlData))){
+        if (confirm(getOfferMessage(urlData))) {
             $.ajax({
                 url: '/books/offercreate',
                 type: 'get',
@@ -139,26 +167,38 @@
                 $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
             };
         });
+        getTxHistoryData();
 
     });
     </script>
-    <div>
-        <form id="paysBookArgs" name="paysBookArgs">
-            <label>Currency pays:</label>
-            <select id="currencyPaysSelector" name="currencyPaysSelector">
-            </select>
-        </form>
+    <div id="container">
+        <div>
+            <table>
+                <td>
+                    <form id="paysBookArgs" name="paysBookArgs">
+                        <label>Currency pays:</label>
+                        <select id="currencyPaysSelector" name="currencyPaysSelector">
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    <form id="getsBookArgs" name="getsBookArgs">
+                        <label>Currency gets:</label>
+                        <select id="currencyGetsSelector" name="currencyGetsSelector">
+                        </select>
+                    </form>
+                </td>
+            </table>
+        </div>
         <br />
-        <form id="getsBookArgs" name="getsBookArgs">
-            <label>Currency gets:</label>
-            <select id="currencyGetsSelector" name="currencyGetsSelector">
-            </select>
-        </form>
-    </div>
-    <br />
-    <input name="" type="button" value="Submit" onClick="getBooksResult()" />
-    <h2>Book list</h2>
-    <div id="bookList">
+        <input name="" type="button" value="Submit" onClick="getBooksResult()" />
+        <h2>Book list</h2>
+        <div id="bookList">
+        </div>
+        <br>
+        <br>
+        <h2>Transaction History</h2>
+        <div id="txHistoryList"></div>
     </div>
 </body>
 
