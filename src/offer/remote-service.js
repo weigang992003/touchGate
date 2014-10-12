@@ -18,7 +18,7 @@ var remotes = [{
 }];
 
 var locals = [{
-    host: 'localhost',
+    host: '192.168.10.11',
     port: 6006,
     secure: false
 }]

@@ -12,8 +12,8 @@ exports.strategyEvents = {
 };
 
 exports.mongodb_server = {
-    host: '127.0.0.1',
-    port: '27017',
+    host: '192.168.10.11',
+    port: '9000',
     server_options: {},
     db_options: {
         w: -1
@@ -101,13 +101,13 @@ exports.currencies_no = {
 }
 
 exports.dbServer = {
-    accountInfo:'mongodb://localhost/account-info',
-    rippleInfo:'mongodb://localhost/ripple-info',
-    theFuture:'mongodb://localhost/the-future'
+    accountInfo:'mongodb://192.168.10.11/account-info',
+    rippleInfo:'mongodb://192.168.10.11/ripple-info',
+    theFuture:'mongodb://192.168.10.11/the-future'
 }
 
 exports.orderSocket = {
-    orderServer: 'ws://localhost:7890'
+    orderServer: 'ws://192.168.10.11:7000'
 }
 
 exports.mother = -1;

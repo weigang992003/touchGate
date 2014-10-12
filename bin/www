@@ -2,8 +2,8 @@
 var debug = require('debug')('dataShow');
 var app = require('../app');
 
-app.set('port', process.env.PORT || 7000);
+app.set('port', process.env.PORT || 8000);
 
-var server = app.listen(app.get('port'),'localhost', function() {
+var server = app.listen(app.get('port'),'192.168.10.11', function() {
   debug('Express server listening on port ' + server.address().port);
 });
