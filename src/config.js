@@ -101,9 +101,9 @@ exports.currencies_no = {
 }
 
 exports.dbServer = {
-    accountInfo:'mongodb://192.168.10.11/account-info',
-    rippleInfo:'mongodb://192.168.10.11/ripple-info',
-    theFuture:'mongodb://192.168.10.11/the-future'
+    accountInfo:'mongodb://192.168.10.11:9000/account-info',
+    rippleInfo:'mongodb://192.168.10.11:9000/ripple-info',
+    theFuture:'mongodb://192.168.10.11:9000/the-future'
 }
 
 exports.orderSocket = {
