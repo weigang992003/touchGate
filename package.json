@@ -18,6 +18,7 @@
     "ripple-lib": "~0.8.2",
     "ws": "~0.4.32",
     "mathjs": "~1.0.1",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "passport": "~0.2.1"
   }
 }

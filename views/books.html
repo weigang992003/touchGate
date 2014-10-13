@@ -5,12 +5,13 @@
     <title>
         <%=title %>
     </title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/tablestyle.css' />
-    <script type="text/javascript" src="/javascripts/libs/jquery.min.js"></script>
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/home.css" rel="stylesheet">
+    <link href='/stylesheets/tablestyle.css' rel='stylesheet'/>
 </head>
 
 <body>
+    <% include main_template.html %>
     <script type="text/javascript">
     var allData = {};
     var currencyArray = [];
