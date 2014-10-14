@@ -33,8 +33,9 @@ function getTableData(callback) {
                     item['getsCurrencyB'] = result[j]['i_gets_currency'];
                     item['getsValueB'] = result[j]['i_gets_value'];
                     item['priceB'] = result[j]['price'];
-                    item['profitRate'] = (1 - item['priceA'] * item['priceB']) / item['priceB'];
-                    item['profit'] = item['profitRate'] * math.min(item['getsValueA'], item['paysValueB']);
+                    item['profitRate'] = item['priceA'] * item['priceB'];
+                    calculateRate = (1 - item['priceA'] * item['priceB']) / item['priceB'];
+                    item['profit'] = calculateRate * math.min(item['getsValueA'], item['paysValueB']);
                     item['paysInc'] = item['getsValueA'] - item['paysValueB'];
                     ret.push(item);
                     break;
