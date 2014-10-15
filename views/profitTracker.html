@@ -114,7 +114,9 @@
         $(rowItem).attr('offerCreateData', offerCreateData);
         currencyCell.innerHTML = paysCurrency + '->' + getsCurrency + '(book)';
         paysValueCell.innerHTML = paysValue;
+        paysValueCell.title = paysIssuer;
         getsValueCell.innerHTML = getsValue;
+        getsValueCell.title = getsIssuer;
         qualityValueCell.innerHTML = quality;
         divQualityValueCell.innerHTML = qualityNew;
     }
