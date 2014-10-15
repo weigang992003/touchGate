@@ -8,7 +8,7 @@ table.reference tr:nth-child(even)	{background-color:#ffffff;}
 table.reference tr.fixzebra			{background-color:#f1f1f1;}
 
 table.reference th{
-	color:#ffffff;background-color:#555555;border:1px solid #555555;padding:3px;vertical-align:top;text-align:left;
+	color:#000000;background-color:#87887E;border:1px solid #555555;padding:3px;vertical-align:top;text-align:left;
 }
 
 table.reference th a:link,table.reference th a:visited{

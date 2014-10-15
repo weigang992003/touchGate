@@ -15,6 +15,39 @@ router.get('/', function(req, res) {
     });
 });
 
+router.get('/getbooksbycurrency', function(req, res) {
+    var getsCurrency = req.query.currencyGetsSelector;
+    var paysCurrency = req.query.currencyPaysSelector;
+    var paysCurrencyArray = new Array();
+    var getsCurrencyArray = new Array();
+    paysCurrencyArray.push(paysCurrency);
+    getsCurrencyArray.push(getsCurrency);
+
+    currencyInfo.getIssuerByCurrency(paysCurrency, function(paysIssuersArray) {
+        currencyInfo.getIssuerByCurrency(getsCurrency, function(getsIssuersArray) {
+            wsbu.exeCmd({
+                "cmd": "book",
+                "params": {
+                    "pays_currency": paysCurrencyArray,
+                    "pays_issuer": paysIssuersArray['issuers'],
+                    "gets_currency": getsCurrencyArray,
+                    "gets_issuer": getsIssuersArray['issuers']
+                },
+                "limit": 1,
+                "filter": 0,
+                "cache": 1
+            }, function(orders) {
+                res.json({
+                    books: formatOrder(orders)
+                });
+            });
+
+
+        })
+    });
+
+});
+
 router.get('/getbooks', function(req, res) {
     var getsIssuers = req.query.getsIssuer;
     var paysIssuers = req.query.paysIssuer;

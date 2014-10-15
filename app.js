@@ -10,6 +10,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var books = require('./routes/books');
 var statistics = require('./routes/statistics');
+var profitTracker = require('./routes/profitTracker');
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/statistics', statistics);
+app.use('/profitTracker', profitTracker);
 app.use('/books', books);
 app.use('/users', users);
 

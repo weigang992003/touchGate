@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Kissingate</title>
+
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/home.css" rel="stylesheet">
+    <link href='/stylesheets/tablestyle.css' rel='stylesheet' />
+</head>
+
+<body>
+    <% include navbar.html %>
+    <script type="text/javascript">
+    function initTxHistoryTable(historyData) {
+        $("#historyTable").remove();
+        $("#txHistoryList").append('<table id="historyTable" style="overflow-y:scroll" class="reference"><tr><th>Currency</th><th>Pays value</th><th>Gets value</th><th>Quality</th><th>1/Quality</th><th>ProfitRate</th><th>Profit</th></tr>');
+        for (var i = historyData.length - 1; i >= 0; i--) {
+            console.log("initialTxHistory(historyData)");
+            var currencyPairA = historyData[i]['paysCurrencyA'] + '_' + historyData[i]['getsCurrencyA'];
+            var currencyPairB = historyData[i]['paysCurrencyB'] + '_' + historyData[i]['getsCurrencyB'];
+            var titleItem = '<tr><th>Currency</th><th>Pays value</th><th>Gets value</th><th>Quality</th><th>1/Quality</th><th>ProfitRate</th><th>Profit</th></tr>';
+            var paysItem = '<tr id="' + currencyPairA + '" value="' + currencyPairA + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyA'] + '->' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['getsValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td>' + 1 / historyData[i]['priceA'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
+            var getsItem = '<tr id="' + currencyPairA + '"value="' + currencyPairB + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyB'] + '->' + historyData[i]['getsCurrencyB'] + '</td><td>' + historyData[i]['paysValueB'] + '</td><td>' + historyData[i]['getsValueB'] + '</td><td>' + historyData[i]['priceB'] + '</td><td>' + 1 / historyData[i]['priceB'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
+
+            $("#historyTable").append(paysItem);
+            if (historyData[i]['paysCurrencyA'] !== historyData[i]['getsCurrencyA'])
+                $("#historyTable").append(getsItem);
+            $("#historyTable").append(titleItem);
+        };
+
+    }
+
+    function getTxHistoryData() {
+        console.log("getTxHistoryData()");
+        $.ajax({
+            url: '/books/txhistory',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            success: function(data) {
+                initTxHistoryTable(data['result']);
+            },
+            error: function(message) {
+                console.log("getTxHistoryData() failed" + message);
+            }
+        });
+
+    }
+
+    function txHistoryItemClick(item) {
+        console.log($(item).attr('value'));
+        var currencyPair = $(item).attr('value') + '_book';
+        var key = document.getElementById(currencyPair);
+        if (key) {
+            // remove the book
+            $(key).remove();
+            removeBookList(item);
+        } else {
+            // add the book
+            $("#historyTable").append('<div id="' + currencyPair + '"</div>');
+            addBookList(item);
+        }
+    }
+
+    function addBookList(item) {
+        var currencies = $(item).attr('value').split('_');
+        var currencyPair = $(item).attr('value');
+        var formData = 'currencyPaysSelector=' + currencies[0] + '&' + 'currencyGetsSelector=' + currencies[1];
+        console.log('addBookList currencyPair: ' + currencyPair);
+        $.ajax({
+            url: '/books/getbooksbycurrency',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            data: formData,
+            success: function(data) {
+                var books = data['books'];
+                var insertCur = getRowCur(currencyPair) + 1;
+                for (var i = 0; i < books.length; i++) {
+                    addBookItem(books[i], insertCur);
+                    insertCur++;
+                };
+            },
+            error: function(message) {}
+        });
+    }
+
+    function addBookItem(bookData, insertCur) {
+        var paysIssuer = bookData['paysIssuer'];
+        var paysCurrency = bookData['paysCurrency'];
+        var paysValue = bookData['paysValue'];
+
+        var getsIssuer = bookData['getsIssuer'];
+        var getsCurrency = bookData['getsCurrency'];
+        var getsValue = bookData['getsValue'];
+
+        var qualityNew = getsValue / paysValue;
+        var quality = bookData['quality'];
+        var offerCreateData = 'paysCurrency=' + getsCurrency + '&paysIssuer=' + getsIssuer + '&paysValue=' + getsValue + '&getsCurrency=' + paysCurrency + '&getsIssuer=' + paysIssuer + '&getsValue=' + paysValue + '&quality=' + qualityNew;
+        var currencyPair = paysCurrency + '_' + getsCurrency;
+        var itemValue = currencyPair + '_book';
+        var table = document.getElementById('historyTable');
+        var rowItem = table.insertRow(insertCur);
+        var currencyCell = rowItem.insertCell(0);
+        var paysValueCell = rowItem.insertCell(1);
+        var getsValueCell = rowItem.insertCell(2);
+        var qualityValueCell = rowItem.insertCell(3);
+        var divQualityValueCell = rowItem.insertCell(4);
+        $(rowItem).attr('onclick', 'bookItemClick(this)');
+        $(rowItem).attr('value', itemValue);
+        $(rowItem).attr('offerCreateData', offerCreateData);
+        currencyCell.innerHTML = paysCurrency + '->' + getsCurrency + '(book)';
+        paysValueCell.innerHTML = paysValue;
+        getsValueCell.innerHTML = getsValue;
+        qualityValueCell.innerHTML = quality;
+        divQualityValueCell.innerHTML = qualityNew;
+    }
+
+    function removeBookList(item) {
+        console.log('removeBookList');
+        var currencyPair = $(item).attr('value') + '_book';
+        var rows = document.getElementById('historyTable').rows;
+        for (var i = 0; i < rows.length; i++) {
+            var bookItem = rows[i];
+            if (bookItem.attributes.value !== undefined) {
+                if ($(bookItem).attr('value') === currencyPair) {
+                    $(bookItem).remove();
+                    i--;
+                }
+            }
+        };
+
+    }
+
+    function getRowCur(valueKey) {
+        var rows = document.getElementById('historyTable').rows;
+        for (var i = 0; i < rows.length; i++) {
+            var bookItem = rows[i];
+            if (bookItem.attributes.value !== undefined) {
+                if ($(bookItem).attr('value') === valueKey) {
+                    return i;
+                }
+            }
+        };
+        return -1;
+    }
+
+    function bookItemClick(item) {
+        var urlData = $(item).attr('offerCreateData');
+        if (confirm(formatOfferDialogMsg(urlData))) {
+            $.ajax({
+                url: '/books/offercreate',
+                type: 'get',
+                dataType: 'json',
+                json: "callback",
+                data: urlData,
+                success: function(data) {
+                    alert(JSON.stringify(data['status']));
+                },
+                error: function(message) {}
+            });
+        }
+    }
+
+    function formatOfferDialogMsg(rawData) {
+        var result = "Will create offer reverse for: \n";
+        return result + rawData;
+    }
+
+    $(function() {
+        getTxHistoryData();
+    });
+    </script>
+    <div class="container">
+    </div>
+    <div id="txHistoryList"></div>
+</body>
+
+</html>
