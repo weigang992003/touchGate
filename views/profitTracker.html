@@ -51,9 +51,10 @@
     }
 
     function txHistoryItemClick(item) {
-        console.log($(item).attr('value'));
-        var currencyPair = $(item).attr('value') + '_book';
+        var itemvalue = $(item).attr('value').split('_');
+        var currencyPair = itemvalue[1] + '_' + itemvalue[0] + '_book';
         var key = document.getElementById(currencyPair);
+        console.log('txHistoryItemClick: ' + currencyPair);
         if (key) {
             // remove the book
             $(key).remove();
@@ -68,7 +69,7 @@
     function addBookList(item) {
         var currencies = $(item).attr('value').split('_');
         var currencyPair = $(item).attr('value');
-        var formData = 'currencyPaysSelector=' + currencies[0] + '&' + 'currencyGetsSelector=' + currencies[1];
+        var formData = 'currencyPaysSelector=' + currencies[1] + '&' + 'currencyGetsSelector=' + currencies[0];
         console.log('addBookList currencyPair: ' + currencyPair);
         $.ajax({
             url: '/books/getbooksbycurrency',
@@ -80,7 +81,7 @@
                 var books = data['books'];
                 var insertCur = getRowCur(currencyPair) + 1;
                 for (var i = 0; i < books.length; i++) {
-                    addBookItem(books[i], insertCur);
+                    addBookItem(books[i], insertCur, item);
                     insertCur++;
                 };
             },
@@ -88,7 +89,8 @@
         });
     }
 
-    function addBookItem(bookData, insertCur) {
+    function addBookItem(bookData, insertCur, item) {
+        var oldQuality = parseFloat(item.cells[3].innerHTML);
         var paysIssuer = bookData['paysIssuer'];
         var paysCurrency = bookData['paysCurrency'];
         var paysValue = bookData['paysValue'];
@@ -112,18 +114,22 @@
         $(rowItem).attr('onclick', 'bookItemClick(this)');
         $(rowItem).attr('value', itemValue);
         $(rowItem).attr('offerCreateData', offerCreateData);
+        rowItem.style.backgroundColor = 'yellow';
         currencyCell.innerHTML = paysCurrency + '->' + getsCurrency + '(book)';
-        paysValueCell.innerHTML = paysValue;
+        paysValueCell.innerHTML = paysValue + '<br>' + bookData['paysDomain'];
         paysValueCell.title = paysIssuer;
-        getsValueCell.innerHTML = getsValue;
+        getsValueCell.innerHTML = getsValue + '<br>' + bookData['getsDomain'];
         getsValueCell.title = getsIssuer;
         qualityValueCell.innerHTML = quality;
         divQualityValueCell.innerHTML = qualityNew;
+        if (oldQuality * quality < 1)
+            qualityValueCell.style.backgroundColor = 'green';
     }
 
     function removeBookList(item) {
         console.log('removeBookList');
-        var currencyPair = $(item).attr('value') + '_book';
+        var itemvalue = $(item).attr('value').split('_');
+        var currencyPair = itemvalue[1] + '_' + itemvalue[0] + '_book';
         var rows = document.getElementById('historyTable').rows;
         for (var i = 0; i < rows.length; i++) {
             var bookItem = rows[i];

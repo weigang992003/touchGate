@@ -3,6 +3,7 @@ var WSBookUtil = require('../src/offer/web-socket-book-util').WSBookUtil;
 var AmountUtil = require('../src/offer/amount-util').AmountUtil;
 var ServerManager = require('../src/offer/server-manager');
 var txHistory = require('../src/offer/txHistoryProcess');
+var issuerDomain = require('../src/statistics/issuerDomain');
 var express = require('express');
 var router = express.Router();
 
@@ -104,10 +105,12 @@ function formatOrder(rawOrders) {
         item['paysCurrency'] = au.getCurrency(rawOrders[i]['TakerPays']);
         item['paysIssuer'] = au.getIssuer(rawOrders[i]['TakerPays']);
         item['paysValue'] = au.getValue(rawOrders[i]['TakerPays']);
+        item['paysDomain'] = issuerDomain.getDomain([item['paysIssuer']]);
 
         item['getsCurrency'] = au.getCurrency(rawOrders[i]['TakerGets']);
         item['getsIssuer'] = au.getIssuer(rawOrders[i]['TakerGets']);
         item['getsValue'] = au.getValue(rawOrders[i]['TakerGets']);
+        item['getsDomain'] = issuerDomain.getDomain([item['getsIssuer']]);
 
         item['quality'] = rawOrders[i]['quality'];
 
