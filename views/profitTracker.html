@@ -28,7 +28,8 @@
             $("#historyTable").append(paysItem);
             if (historyData[i]['paysCurrencyA'] !== historyData[i]['getsCurrencyA'])
                 $("#historyTable").append(getsItem);
-            $("#historyTable").append(titleItem);
+            if (i > 0)
+                $("#historyTable").append(titleItem);
         };
 
     }
