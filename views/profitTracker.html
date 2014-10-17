@@ -8,7 +8,7 @@
 
     <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/home.css" rel="stylesheet">
-    <link href='/stylesheets/tablestyle.css' rel='stylesheet' />
+    <link href="/stylesheets/tablestyle.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -101,7 +101,7 @@
 
         var qualityNew = getsValue / paysValue;
         var quality = bookData['quality'];
-        var offerCreateData = 'paysCurrency=' + getsCurrency + '&paysIssuer=' + getsIssuer + '&paysValue=' + getsValue + '&getsCurrency=' + paysCurrency + '&getsIssuer=' + paysIssuer + '&getsValue=' + paysValue + '&quality=' + qualityNew;
+        var offerCreateData = 'paysCurrency=' + getsCurrency + '=paysIssuer=' + getsIssuer + '=paysValue=' + getsValue + '=getsCurrency=' + paysCurrency + '=getsIssuer=' + paysIssuer + '=getsValue=' + paysValue + '=quality=' + qualityNew;
         var currencyPair = paysCurrency + '_' + getsCurrency;
         var itemValue = currencyPair + '_book';
         var table = document.getElementById('historyTable');
@@ -156,9 +156,35 @@
         return -1;
     }
 
+    function getRowItem(valueKey) {
+        var rows = document.getElementById('historyTable').rows;
+        for (var i = 0; i < rows.length; i++) {
+            var bookItem = rows[i];
+            if (bookItem.attributes.value !== undefined) {
+                if ($(bookItem).attr('value') === valueKey) {
+                    return bookItem;
+                }
+            }
+        };
+        return null;
+    }
+
     function bookItemClick(item) {
         var urlData = $(item).attr('offerCreateData');
-        if (confirm(formatOfferDialogMsg(urlData))) {
+        var formatedData = convertOfferDataToJson(urlData);
+        var msg = 'I Gets Currency/Value:\n';
+        msg += formatedData['paysCurrency'] + '/' + formatedData['paysValue'] + '\n';
+        msg += 'I Pays Currency/Value:\n';
+        msg += formatedData['getsCurrency'] + '/' + formatedData['getsValue'] + '\n';
+        msg += 'I pays '+ formatedData['getsCurrency'] +' value: \n';
+
+        var iPaysValue = prompt(msg, formatedData['getsValue']);
+
+        if (iPaysValue != null && iPaysValue != "") {
+            paysValue = parseFloat(iPaysValue);
+            formatedData['getsValue'] = paysValue;
+            formatedData['paysValue'] = paysValue * formatedData['quality'];
+            urlData = convertJsonToOfferData(formatedData);
             $.ajax({
                 url: '/books/offercreate',
                 type: 'get',
@@ -166,6 +192,7 @@
                 json: "callback",
                 data: urlData,
                 success: function(data) {
+                    refreshBookList(item);
                     alert(JSON.stringify(data['status']));
                 },
                 error: function(message) {}
@@ -173,9 +200,32 @@
         }
     }
 
-    function formatOfferDialogMsg(rawData) {
-        var result = "Will create offer reverse for: \n";
-        return result + rawData;
+    function refreshBookList(bookItem) {
+        var value = $(item).attr('value').split('_');
+        var valueKey = value[1] + '_' + value[0];
+        var hsItem = getRowItem(valueKey);
+        if (hsItem !== null) {
+            removeBookList(hsItem);
+            addBookList(hsItem);
+        }
+    }
+
+    function convertOfferDataToJson(rawData) {
+        var ret = {};
+        var keyMapData = rawData.split('=');
+        ret['paysCurrency'] = keyMapData[1];
+        ret['paysIssuer'] = keyMapData[3];
+        ret['paysValue'] = keyMapData[5];
+        ret['getsCurrency'] = keyMapData[7];
+        ret['getsIssuer'] = keyMapData[9];
+        ret['getsValue'] = keyMapData[11];
+        ret['quality'] = keyMapData[13];
+        return ret;
+    }
+
+    function convertJsonToOfferData(rawData) {
+        var offerCreateData = 'paysCurrency=' + rawData['getsCurrency'] + '&paysIssuer=' + rawData['getsIssuer'] + '&paysValue=' + rawData['getsValue'] + '&getsCurrency=' + rawData['paysCurrency'] + '&getsIssuer=' + rawData['paysIssuer'] + '&getsValue=' + rawData['paysValue'] + '&quality=' + rawData['quality'];
+        return offerCreateData;
     }
 
     $(function() {
