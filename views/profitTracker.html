@@ -127,8 +127,13 @@
         getsValueCell.title = getsIssuer;
         qualityValueCell.innerHTML = quality;
         divQualityValueCell.innerHTML = qualityNew;
-        if (oldQuality * quality < 1)
-            qualityValueCell.style.backgroundColor = 'green';
+        if (paysCurrency !== getsCurrency) {
+            if (oldQuality * quality < 1)
+                qualityValueCell.style.backgroundColor = 'green';
+        } else {
+            if (quality < 1)
+                qualityValueCell.style.backgroundColor = 'green';
+        }
     }
 
     function removeBookList(item) {
