@@ -36,9 +36,9 @@ router.get('/getbooksbycurrency', function(req, res) {
                     "gets_currency": getsCurrencyArray,
                     "gets_issuer": getsIssuersArray['issuers']
                 },
-                "limit": 1,
+                "limit": 3,
                 "filter": 0,
-                "cache": 1
+                "cache": 0
             }, function(orders) {
                 res.json({
                     books: formatOrder(orders)
