@@ -22,12 +22,16 @@
             var currencyPairA = historyData[i]['paysCurrencyA'] + '_' + historyData[i]['getsCurrencyA'];
             var currencyPairB = historyData[i]['paysCurrencyB'] + '_' + historyData[i]['getsCurrencyB'];
             var titleItem = '<tr><th>Currency</th><th>Pays value</th><th>Gets value</th><th>Quality</th><th>1/Quality</th><th>ProfitRate</th><th>Profit</th></tr>';
-            var paysItem = '<tr id="' + currencyPairA + '" value="' + currencyPairA + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyA'] + '->' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['getsValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td>' + 1 / historyData[i]['priceA'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
-            var getsItem = '<tr id="' + currencyPairA + '"value="' + currencyPairB + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyB'] + '->' + historyData[i]['getsCurrencyB'] + '</td><td>' + historyData[i]['paysValueB'] + '</td><td>' + historyData[i]['getsValueB'] + '</td><td>' + historyData[i]['priceB'] + '</td><td>' + 1 / historyData[i]['priceB'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
-
-            $("#historyTable").append(paysItem);
-            if (historyData[i]['paysCurrencyA'] !== historyData[i]['getsCurrencyA'])
+            if (historyData[i]['paysCurrencyA'] !== historyData[i]['getsCurrencyA']) {
+                var paysItem = '<tr id="' + currencyPairA + '" value="' + currencyPairA + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyA'] + '->' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['getsValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td>' + 1 / historyData[i]['priceA'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
+                var getsItem = '<tr id="' + currencyPairA + '"value="' + currencyPairB + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyB'] + '->' + historyData[i]['getsCurrencyB'] + '</td><td>' + historyData[i]['paysValueB'] + '</td><td>' + historyData[i]['getsValueB'] + '</td><td>' + historyData[i]['priceB'] + '</td><td>' + 1 / historyData[i]['priceB'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
+                $("#historyTable").append(paysItem);
                 $("#historyTable").append(getsItem);
+            } else {
+                var paysItem = '<tr id="' + currencyPairA + '" value="' + currencyPairA + '" onclick="txHistoryItemClick(this)"><td>' + historyData[i]['paysCurrencyA'] + '->' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['getsValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td></td><td></td><td>' + historyData[i]['paysCurrencyA'] + ':' + historyData[i]['profit'] + '</td></tr>';
+                $("#historyTable").append(paysItem);
+            }
+
             if (i > 0)
                 $("#historyTable").append(titleItem);
         };
@@ -177,7 +181,7 @@
         msg += formatedData['paysCurrency'] + '/' + formatedData['paysValue'] + '\n';
         msg += 'I Pays Currency/Value:\n';
         msg += formatedData['getsCurrency'] + '/' + formatedData['getsValue'] + '\n';
-        msg += 'I pays '+ formatedData['getsCurrency'] +' value: \n';
+        msg += 'I pays ' + formatedData['getsCurrency'] + ' value: \n';
 
         var iPaysValue = prompt(msg, formatedData['getsValue']);
 
