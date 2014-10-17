@@ -142,7 +142,7 @@ var issuerDomainMap = {
 
 exports.getDomain = function(issuer) {
     var domain = issuerDomainMap[issuer];
-    if (domain === null)
+    if (domain === null || domain === undefined)
         return issuer;
     return domain;
 }
