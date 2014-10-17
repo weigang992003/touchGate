@@ -114,6 +114,18 @@ function formatOrder(rawOrders) {
 
         item['quality'] = rawOrders[i]['quality'];
 
+        if (item['paysCurrency'] === 'XRP') {
+            item['paysValue'] = item['paysValue'] / 1000000;
+            item['quality'] = item['quality'] / 1000000;
+            item['paysDomain'] = 'XRP';
+        }
+        if (item['getsCurrency'] === 'XRP') {
+            item['getsValue'] = item['getsValue'] / 1000000;
+            item['quality'] = item['quality'] * 1000000;
+            item['getsDomain'] = 'XRP';
+        }
+
+
         ret.push(item);
     };
     return ret;
