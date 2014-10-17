@@ -10,6 +10,8 @@ var router = express.Router();
 var wsbu = new WSBookUtil();
 var au = new AmountUtil();
 
+var defaultBookSizes = 3;
+
 router.get('/', function(req, res) {
     res.render('books', {
         title: 'books'
@@ -86,9 +88,9 @@ router.get('/getbooks', function(req, res) {
             "gets_currency": getsCurrencyArray,
             "gets_issuer": getsIssuersArray
         },
-        "limit": 1,
+        "limit": 3,
         "filter": 0,
-        "cache": 1
+        "cache": 0
     }, function(orders) {
         res.json({
             books: formatOrder(orders)
@@ -128,7 +130,12 @@ function formatOrder(rawOrders) {
 
         ret.push(item);
     };
-    return ret;
+
+    var sorted = ret.sort(function(a, b) {
+        return a['quality'] - b['quality'];
+    });
+
+    return sorted.slice(0, defaultBookSizes);
 }
 
 router.get('/getcurrencies', function(req, res) {
