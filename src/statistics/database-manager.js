@@ -25,7 +25,30 @@ var tradeDataSchema = mongoose.Schema({
     collection: 'reallyTradeData'
 });
 
+var gatewayInfoSchema = mongoose.Schema({
+    _id: String,
+    title:String,
+    domain:String,
+    transferRate:Number
+}, {
+    collection: 'gatewayInfo'
+});
+
 var TradeData = connect.model('tradeData', tradeDataSchema);
+var GatewayInfo = connect.model('gatewayInfo', gatewayInfoSchema);
+
+function getAllGatewayInfo(callback) {
+    var query = GatewayInfo.find({});
+    query.select('title domain transferRate').exec(function(err, result) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        if (callback) {
+            callback(result);
+        }
+    });
+}
 
 exports.initialDrawDataByValue = function(startTime, endTime, currency, callback) {
     var issuerCategories = new Array();
@@ -233,3 +256,5 @@ function convertSecondsToTime(seconds) {
     var date = new Date(seconds * 1000).toJSON();
     return date.split('T')[0];
 }
+
+exports.getAllGatewayInfo = getAllGatewayInfo;

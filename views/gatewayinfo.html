@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Kissingate</title>
+
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/home.css" rel="stylesheet">
+    <link href='/stylesheets/tablestyle.css' rel='stylesheet'/>
+</head>
+
+<body>
+    <% include navbar.html %>
+    <script type="text/javascript">
+        function createInfoTable(info) {
+            for (var i = info.length - 1; i >= 0; i--) {
+                var domain = info[i]['domain'];
+                if (domain === null) {
+                    var title = info[i]['title'];
+                    if (title === null)
+                        domain = '<td></td>';
+                    else
+                        domain = '<td>'+ title +'</td>';
+                } else {
+                    domain = '<td><a href="' + domain + '" rel="external">' + info[i]['title'] + '</a></td>';
+                }
+                var item = '<tr><td>'+info[i]['_id']+'</td>'+ domain+'<td>'+info[i]['transferRate']+'</td></tr>';
+                 $("#infoTable").append(item);
+            };
+        }
+
+        $(function() {
+            $("#infoTableDiv").append('<table id="infoTable" class="reference"><tr><th>Issuer</th><th>Title</th><th>Transfer Rate</th></tr>');
+            $.ajax({
+                url: '/gatewayInfo/getallinfo',
+                type: 'get',
+                dataType: 'json',
+                json: "callback",
+                data: '',
+                success: function(data) {
+                    console.log(data);
+                    if (data['status'] === 'success') {
+                        createInfoTable(data['result']);
+                    } else {
+                        $("#infoTable").append('<tr><td>Get Info failed</td></tr>');
+                    }
+                },
+                error: function(message) {}
+            });
+        });
+    </script>
+    <div id='container' class="container">
+
+        <div id='infoTableDiv'>
+        </div>
+    </div>
+</body>
+
+</html>
