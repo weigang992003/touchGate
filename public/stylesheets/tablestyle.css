@@ -1,7 +1,12 @@
 table.reference,table.tecspec{
-	border-collapse:collapse;width:100%;
+	border-collapse:collapse;width:90%;
 }
-
+table.reference tbody {
+    overflow: scroll;
+}
+table.reference thead tr {
+    position:absolute;
+}
 table.reference tr:nth-child(odd)	{background-color:#f1f1f1;}
 table.reference tr:nth-child(even)	{background-color:#ffffff;}
 

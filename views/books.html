@@ -86,33 +86,6 @@
         }
     }
 
-    function getTxHistoryData() {
-        console.log("getTxHistoryData()");
-        $.ajax({
-            url: '/books/txhistory',
-            type: 'get',
-            dataType: 'json',
-            json: "callback",
-            success: function(data) {
-                initialTxHistory(data['result']);
-            },
-            error: function(message) {
-                console.log("getTxHistoryData() failed" + message);
-            }
-        });
-
-    }
-
-    function initialTxHistory(historyData) {
-        console.log("initialTxHistory(historyData)");
-        $("#txHistoryTable").remove();
-        $("#txHistoryList").append('<table id="txHistoryTable" class="reference"><tr><th>P/G currency</th><th>Pays value</th><th>Pays price</th><th>Gets value</th><th>Gets price</th><th>PaysInc</th><th>ProfitRate</th><th>Profit</th></tr>');
-        for (var i = historyData.length - 1; i >= 0; i--) {
-            var item = '<tr><td>' + historyData[i]['paysCurrencyA'] + '/' + historyData[i]['getsCurrencyA'] + '</td><td>' + historyData[i]['paysValueA'] + '</td><td>' + historyData[i]['priceA'] + '</td><td>' + historyData[i]['getsValueB'] +'</td><td>' + historyData[i]['priceB'] + '</td><td>' + historyData[i]['paysInc'] + '</td><td>' + historyData[i]['profitRate'] + '</td><td>'+historyData[i]['paysCurrencyA']+':'+historyData[i]['profit']+'</td></tr>';
-            $("#txHistoryTable").append(item);
-        };
-    }
-
     function tableItemClick(args) {
         var urlData = $(args).attr('value');
         if (confirm(getOfferMessage(urlData))) {
@@ -168,11 +141,9 @@
                 $("#getsIssuerGroup").append('<br /><input type="checkbox" name="getsIssuer" value=' + issuers[j] + ' checked="checked" />' + issuers[j]);
             };
         });
-        getTxHistoryData();
-
     });
     </script>
-    <div id="container">
+    <div id="container" class="container">
         <div>
             <table>
                 <td>
@@ -193,13 +164,9 @@
         </div>
         <br />
         <input name="" type="button" value="Submit" onClick="getBooksResult()" />
-        <h2>Book list</h2>
+            <h2>Book list</h2>
         <div id="bookList">
         </div>
-        <br>
-        <br>
-        <h2>Transaction History</h2>
-        <div id="txHistoryList"></div>
     </div>
 </body>
 
