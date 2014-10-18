@@ -68,7 +68,7 @@
     function initialBookList(bookArray) {
         $("#bookTable").remove();
         $("#bookList").append('<table id="bookTable" class="reference"><tr><th>Pays value</th><th>Gets value</th><th>Quality</th></tr>');
-        for (var i = bookArray.length - 1; i >= 0; i--) {
+        for (var i = 0; i < bookArray.length; i++) {
             var paysIssuer = bookArray[i]['paysIssuer'];
             var paysCurrency = bookArray[i]['paysCurrency'];
             var paysValue = bookArray[i]['paysValue'];
@@ -81,7 +81,9 @@
             var quality = bookArray[i]['quality'];
             var offerCreateData = 'paysCurrency=' + getsCurrency + '&paysIssuer=' + getsIssuer + '&paysValue=' + getsValue + '&getsCurrency=' + paysCurrency + '&getsIssuer=' + paysIssuer + '&getsValue=' + paysValue + '&quality=' + qualityNew;
 
-            var item = '<tr value=' + offerCreateData + ' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> ' + paysValue + '</td><td title="' + getsIssuer + '">' + getsValue + '</td><td>' + quality + '</td></tr>';
+            var paysItem = paysValue + '<br>' + bookArray[i]['paysDomain'];
+            var getsItem = getsValue + '<br>' + bookArray[i]['getsDomain'];
+            var item = '<tr value=' + offerCreateData + ' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> ' + paysItem + '</td><td title="' + getsIssuer + '">' + getsItem + '</td><td>' + quality + '</td></tr>';
             $("#bookTable").append(item);
         }
     }
