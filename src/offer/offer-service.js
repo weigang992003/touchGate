@@ -76,6 +76,8 @@ OfferService.prototype.createOffer = function(taker_pays, taker_gets, logger, cr
     var accountId = this.accountId;
     var offers = this.offers;
     console.log('create Offer return need check taker_pays: ' + JSON.stringify(taker_pays) + ', taker_gets: ' + JSON.stringify(taker_gets));
+    if (callback)
+        callback('test success');
     return;
 
     var tx = remote.transaction();
