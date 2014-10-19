@@ -185,4 +185,27 @@ router.get('/txhistory', function(req, res) {
         });
     });
 });
+
+router.get('/getBalance', function(req, res) {
+    var currency = req.query.currency;
+    var issuer = req.query.issuer;
+    ServerManager.getReallyBalance(issuer, currency, function(result) {
+        var ret = {};
+        if (currency === 'XRP') {
+            var value = result.to_json() / 1000000;
+            ret = {
+                'currency': 'XRP',
+                'value': value
+            };
+        } else {
+            ret = result.to_json();
+        }
+        console.log(ret);
+        res.json({
+            result: ret
+        });
+    });
+});
+
+
 module.exports = router;

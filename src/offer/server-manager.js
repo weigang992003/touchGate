@@ -3,6 +3,7 @@ var events = require('events');
 var OfferService = require('./offer-service').OfferService;
 var RemoteService = require('./remote-service');
 var AmountUtil = require('./amount-util.js').AmountUtil;
+var TrustLineService = require('./trust-line-service').TrustLineService;
 var config = require('../config.js');
 var crypto = require('./crypto-util.js');
 var tfmjs = require('./the-future-manager.js');
@@ -16,6 +17,8 @@ var secret = null;
 var remote = RemoteService.getRemote();
 
 var offerService = null;
+
+var trustLineServer = null;
 
 console.log("step1:getAccount!")
 tfmjs.getAccount(config.marketMaker, function(result) {
@@ -46,12 +49,9 @@ function remoteConnect(env) {
             console.log("server connect success");
             //offerService.getOffers();
 
-            /*
-            tls = new TrustLineService(remote, account);
-            tls.getLines(function() {
-                listenProfitOrder();
+            trustLineServer = new TrustLineService(remote, account);
+            trustLineServer.getLines(function() {
             });
-*/
 
             remote.on('error', function(error) {
                 throw new Error("remote error!");
@@ -65,7 +65,7 @@ function remoteConnect(env) {
     });
 }
 
-exports.makeOffer = function(takerPays, takerGets, callback) {
+function makeOffer(takerPays, takerGets, callback) {
     var order = {};
     if (takerPays['currency'] === 'XRP')
         order['TakerPays'] = takerPays['value'];
@@ -79,6 +79,7 @@ exports.makeOffer = function(takerPays, takerGets, callback) {
 
     makeSameCurrencyProfit(order, callback);
 }
+
 function makeSameCurrencyProfit(order, callback) {
     console.log("create offer: " + JSON.stringify(order));
     var order_taker_pays = Amount.from_json(order.TakerPays);
@@ -87,8 +88,8 @@ function makeSameCurrencyProfit(order, callback) {
     order_taker_pays = order_taker_pays.product_human("1.0001");
 
     /*
-    var order_pays_balance = tls.getBalance(au.getIssuer(order.TakerPays), au.getCurrency(order.TakerPays));
-    var order_gets_capacity = tls.getCapacity(au.getIssuer(order.TakerGets), au.getCurrency(order.TakerGets));
+    var order_pays_balance = trustLineServer.getBalance(au.getIssuer(order.TakerPays), au.getCurrency(order.TakerPays));
+    var order_gets_capacity = trustLineServer.getCapacity(au.getIssuer(order.TakerGets), au.getCurrency(order.TakerGets));
     console.log("order_taker_pays for same currency:", order_taker_pays.to_text_full());
     console.log("order_gets_capacity for same currency:", order_gets_capacity.to_text_full());
 
@@ -104,11 +105,7 @@ function makeSameCurrencyProfit(order, callback) {
 */
     var cmd = buildCmd(order);
 
-    // need login ok
-    console.log("need login which in server-manager");
-    return
-
-    offerService.createSCPOffer(order_taker_pays.to_json(), order_taker_gets.to_json(), cmd, null, callback);
+    offerService.createSCPOffer(order_taker_gets.to_json(), order_taker_pays.to_json(), cmd, null, callback);
 }
 
 function buildCmd(order) {
@@ -142,3 +139,12 @@ function buildCmd(order) {
 
     return cmd;
 }
+
+function getReallyBalance(issuer, currency, callback) {
+    trustLineServer.getLines(function(lines) {
+        var jsonValue = trustLineServer.getBalance(issuer, currency);
+        callback(jsonValue);
+    });
+}
+exports.makeOffer = makeOffer;
+exports.getReallyBalance = getReallyBalance;

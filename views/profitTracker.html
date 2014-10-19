@@ -188,15 +188,41 @@
     function bookItemClick(item) {
         var urlData = $(item).attr('offerCreateData');
         var formatedData = convertOfferDataToJson(urlData);
+        var getCapacityData = 'currency=' + formatedData['getsCurrency'] + '&issuer=' + formatedData['getsIssuer'];
+        playSpinner();
+        $.ajax({
+            url: '/books/getBalance',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            data: getCapacityData,
+            success: function(data) {
+                var capacity = data['result']['value'];
+                stopSpinner();
+                showOfferDialog(formatedData, capacity, urlData);
+            },
+            error: function(message) {
+                alert('get balance failed');
+                stopSpinner();
+            }
+        });
+    }
+
+    function showOfferDialog(formatedData, capacity, urlData) {
+        var balance = parseFloat(capacity);
+        var getsValue = parseFloat(formatedData['getsValue']);
+        var iPaysValue = balance > getsValue ? getsValue : balance;
         var msg = '';
         msg += formatedData['paysValue'] + ' / ' + formatedData['paysCurrency']+ '  (I Gets)\n';
         msg += formatedData['getsValue'] + ' / ' + formatedData['getsCurrency'] + '  (I Pays)\n';
         msg += formatedData['quality'] + '  (Quality)\n';
-        msg += 'I should pays max (' + formatedData['getsValue'] + '):\n';
+        msg += balance + '  ( '+ formatedData['getsCurrency'] +'/balance)\n';
+        msg += 'I should pays max (' + iPaysValue + ')\n';
+        msg += formatedData['getsCurrency'] + ': \n';
 
-        var iPaysValue = prompt(msg, formatedData['getsValue']);
+        iPaysValue = prompt(msg, iPaysValue);
 
-        if (iPaysValue != null && iPaysValue != "") {
+        if (iPaysValue != null && iPaysValue != "" && iPaysValue > 0) {
             paysValue = parseFloat(iPaysValue);
             formatedData['getsValue'] = paysValue;
             formatedData['paysValue'] = paysValue * formatedData['quality'];
@@ -213,8 +239,12 @@
                     alert(JSON.stringify(data['status']));
                     stopSpinner();
                 },
-                error: function(message) {stopSpinner();}
+                error: function(message) {
+                    stopSpinner();
+                }
             });
+        } else {
+            alert("Doesn't have enough balance");
         }
     }
 
@@ -263,7 +293,7 @@
     }
 
     $(function() {
-        var opts = {length: 20,radius: 30};
+        var opts = {length: 20,radius: 30, top: '50%', left: '50%'};
         spinner = new Spinner(opts);
         getTxHistoryData();
     });
