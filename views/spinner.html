@@ -1,0 +1,54 @@
+<style type="text/css">
+#spinneroverlay {
+    display: none;
+    opacity: .6;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background: #FFF;
+    width: 100%;
+    z-index: 10;
+}
+#spinnercontent {
+    display: none;
+    position: fixed;
+    background: #FFF;
+    border-radius: 7px;
+    width: 550px;
+    z-index: 10;
+}
+</style>
+<script src="/javascripts/spin.min.js"></script>
+<script type="text/javascript">
+var CustomSpinner = new CustomSpinner();
+
+function CustomSpinner() {
+    var opts = {
+        length: 20,
+        color: '#000',
+        radius: 30
+    };
+    var spinner = new Spinner(opts);
+    this.play = function(dialog) {
+        var winW = window.innerWidth;
+        var winH = window.innerHeight;
+        var spinneroverlay = document.getElementById('spinneroverlay');
+        var spinnercontent = document.getElementById('spinnercontent');
+        spinneroverlay.style.display = "block";
+        spinneroverlay.style.height = winH + "px";
+        spinnercontent.style.left = (winW / 2) - (550 * .5) + "px";
+        spinnercontent.style.top = "50%";
+        spinnercontent.style.display = "block";
+
+        var target = document.getElementById('spinnercontent');
+        spinner.spin(target);
+
+    }
+    this.stop = function() {
+        document.getElementById('spinnercontent').style.display = "none";
+        document.getElementById('spinneroverlay').style.display = "none";
+    }
+}
+</script>
+<div id="spinneroverlay"></div>
+<div id="spinnercontent"></div>
