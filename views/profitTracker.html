@@ -182,11 +182,11 @@
     function bookItemClick(item) {
         var urlData = $(item).attr('offerCreateData');
         var formatedData = convertOfferDataToJson(urlData);
-        var msg = 'I Gets Currency/Value:\n';
-        msg += formatedData['paysCurrency'] + '/' + formatedData['paysValue'] + '\n';
-        msg += 'I Pays Currency/Value:\n';
-        msg += formatedData['getsCurrency'] + '/' + formatedData['getsValue'] + '\n';
-        msg += 'I pays ' + formatedData['getsCurrency'] + ' value: \n';
+        var msg = '';
+        msg += formatedData['paysValue'] + ' / ' + formatedData['paysCurrency']+ '  (I Gets)\n';
+        msg += formatedData['getsValue'] + ' / ' + formatedData['getsCurrency'] + '  (I Pays)\n';
+        msg += formatedData['quality'] + '  (Quality)\n';
+        msg += 'I should pays max (' + formatedData['getsValue'] + '):\n';
 
         var iPaysValue = prompt(msg, formatedData['getsValue']);
 
@@ -242,7 +242,7 @@
         getTxHistoryData();
     });
     </script>
-    <div class="container">
+    <div >
         <div id="txHistoryList"></div>
     </div>
 </body>
