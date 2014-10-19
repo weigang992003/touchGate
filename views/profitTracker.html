@@ -9,6 +9,7 @@
     <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/home.css" rel="stylesheet">
     <link href="/stylesheets/tablestyle.css" rel="stylesheet" />
+    <script src="/javascripts/spin.min.js"></script>
 </head>
 
 <body>
@@ -40,6 +41,7 @@
 
     function getTxHistoryData() {
         console.log("getTxHistoryData()");
+        playSpinner();
         $.ajax({
             url: '/books/txhistory',
             type: 'get',
@@ -47,8 +49,10 @@
             json: "callback",
             success: function(data) {
                 initTxHistoryTable(data['result']);
+                stopSpinner();
             },
             error: function(message) {
+                stopSpinner();
                 console.log("getTxHistoryData() failed" + message);
             }
         });
@@ -76,6 +80,7 @@
         var currencyPair = $(item).attr('value');
         var formData = 'currencyPaysSelector=' + currencies[1] + '&' + 'currencyGetsSelector=' + currencies[0];
         console.log('addBookList currencyPair: ' + currencyPair);
+        playSpinner();
         $.ajax({
             url: '/books/getbooksbycurrency',
             type: 'get',
@@ -89,8 +94,9 @@
                     addBookItem(books[i], insertCur, item);
                     insertCur++;
                 };
+                stopSpinner();
             },
-            error: function(message) {}
+            error: function(message) {stopSpinner();}
         });
     }
 
@@ -195,6 +201,7 @@
             formatedData['getsValue'] = paysValue;
             formatedData['paysValue'] = paysValue * formatedData['quality'];
             urlData = convertJsonToOfferData(formatedData);
+            playSpinner();
             $.ajax({
                 url: '/books/offercreate',
                 type: 'get',
@@ -204,8 +211,9 @@
                 success: function(data) {
                     refreshBookList(item);
                     alert(JSON.stringify(data['status']));
+                    stopSpinner();
                 },
-                error: function(message) {}
+                error: function(message) {stopSpinner();}
             });
         }
     }
@@ -238,12 +246,31 @@
         return offerCreateData;
     }
 
+    var spinner;
+    function playSpinner() {
+        document.addEventListener("click", disableClickEvent, true);
+        var target = document.getElementById('spinner');
+        spinner.spin(target);
+    }
+
+    function stopSpinner() {
+        spinner.stop();
+        document.removeEventListener("click", disableClickEvent, true);
+    }
+
+    function disableClickEvent(e) {
+        e.stopPropagation();
+    }
+
     $(function() {
+        var opts = {length: 20,radius: 30};
+        spinner = new Spinner(opts);
         getTxHistoryData();
     });
     </script>
     <div >
         <div id="txHistoryList"></div>
+        <div id="spinner"></div>
     </div>
 </body>
 
