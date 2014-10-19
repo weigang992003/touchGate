@@ -198,8 +198,13 @@
             data: getCapacityData,
             success: function(data) {
                 var capacity = data['result']['value'];
+                var balance = parseFloat(capacity);
                 stopSpinner();
-                showOfferDialog(formatedData, capacity, urlData);
+                if (balance <= 0) {
+                    alert("Doesn't have enough balance");
+                } else {
+                    showOfferDialog(formatedData, capacity, urlData, item);
+                }
             },
             error: function(message) {
                 alert('get balance failed');
@@ -208,7 +213,7 @@
         });
     }
 
-    function showOfferDialog(formatedData, capacity, urlData) {
+    function showOfferDialog(formatedData, capacity, urlData, item) {
         var balance = parseFloat(capacity);
         var getsValue = parseFloat(formatedData['getsValue']);
         var iPaysValue = balance > getsValue ? getsValue : balance;
@@ -243,13 +248,11 @@
                     stopSpinner();
                 }
             });
-        } else {
-            alert("Doesn't have enough balance");
         }
     }
 
     function refreshBookList(bookItem) {
-        var value = $(item).attr('value').split('_');
+        var value = $(bookItem).attr('value').split('_');
         var valueKey = value[1] + '_' + value[0];
         var hsItem = getRowItem(valueKey);
         if (hsItem !== null) {
