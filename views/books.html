@@ -13,6 +13,7 @@
 
 <body>
     <% include navbar.html %>
+    <% include spinner.html %>
     <script type="text/javascript">
     var allData = {};
     var currencyArray = [];
@@ -52,7 +53,7 @@
 
     function getBooksResult() {
         var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize();
-        playSpinner();
+        CustomSpinner.play();
         $.ajax({
             url: '/books/getbooks',
             type: 'get',
@@ -62,9 +63,9 @@
             success: function(data) {
                 console.log(data['books']);
                 initialBookList(data['books']);
-                stopSpinner();
+                CustomSpinner.stop();
             },
-            error: function(message) {stopSpinner();}
+            error: function(message) {CustomSpinner.stop();}
         });
     }
 
@@ -94,7 +95,7 @@
     function tableItemClick(args) {
         var urlData = $(args).attr('value');
         if (confirm(getOfferMessage(urlData))) {
-            playSpinner();
+            CustomSpinner.play();
             $.ajax({
                 url: '/books/offercreate',
                 type: 'get',
@@ -102,10 +103,10 @@
                 json: "callback",
                 data: urlData,
                 success: function(data) {
-                    stopSpinner();
+                    CustomSpinner.stop();
                     alert(JSON.stringify(data['status']));
                 },
-                error: function(message) {stopSpinner();}
+                error: function(message) {CustomSpinner.stop();}
             });
         }
     }
@@ -115,26 +116,9 @@
         return result + rawData;
     }
 
-    var spinner;
-    function playSpinner() {
-        document.addEventListener("click", disableClickEvent, true);
-        var target = document.getElementById('spinner');
-        spinner.spin(target);
-    }
-
-    function stopSpinner() {
-        spinner.stop();
-        document.removeEventListener("click", disableClickEvent, true);
-    }
-
-    function disableClickEvent(e) {
-        e.stopPropagation();
-    }
-
     $(function() {
         var opts = {length: 20,radius: 30};
-        spinner = new Spinner(opts);
-        playSpinner();
+        CustomSpinner.play();
         $.ajax({
             url: '/books/getcurrencies',
             type: 'get',
@@ -147,9 +131,9 @@
                 initialGetsCurrency();
                 initialPaysCurrency();
                 getBooksResult();
-                stopSpinner();
+                CustomSpinner.stop();
             },
-            error: function(message) {stopSpinner();}
+            error: function(message) {CustomSpinner.stop();}
         });
         $("#currencyPaysSelector").change(function() {
             var currency = $(this).val();
