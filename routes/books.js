@@ -137,12 +137,12 @@ function formatOrder(rawOrders, isBookTab) {
         ret.push(item);
     };
 
-    if (isBookTab)
-        return ret;
-
     var sorted = ret.sort(function(a, b) {
         return a['quality'] - b['quality'];
     });
+
+    if (isBookTab)
+        return sorted;
 
     return sorted.slice(0, defaultBookSizes);
 }
