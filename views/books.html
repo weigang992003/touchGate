@@ -87,14 +87,58 @@
 
             var paysItem = paysValue + '<br>' + bookArray[i]['paysDomain'];
             var getsItem = getsValue + '<br>' + bookArray[i]['getsDomain'];
-            var item = '<tr value=' + offerCreateData + ' onClick="tableItemClick(this)"><td title="' + paysIssuer + '"> ' + paysItem + '</td><td title="' + getsIssuer + '">' + getsItem + '</td><td>' + quality + '</td><td>'+qualityNew+'</td></tr>';
+            var item = '<tr offerCreateData=' + offerCreateData + ' onClick="bookItemClick(this)"><td title="' + paysIssuer + '"> ' + paysItem + '</td><td title="' + getsIssuer + '">' + getsItem + '</td><td>' + quality + '</td><td>'+qualityNew+'</td></tr>';
             $("#bookTable").append(item);
         }
     }
 
-    function tableItemClick(args) {
-        var urlData = $(args).attr('value');
-        if (confirm(getOfferMessage(urlData))) {
+    function bookItemClick(item) {
+        var urlData = $(item).attr('offerCreateData');
+        var formatedData = convertOfferDataToJson(urlData);
+        var getCapacityData = 'currency=' + formatedData['getsCurrency'] + '&issuer=' + formatedData['getsIssuer'];
+        CustomSpinner.play();
+        $.ajax({
+            url: '/books/getBalance',
+            type: 'get',
+            dataType: 'json',
+            json: "callback",
+            data: getCapacityData,
+            success: function(data) {
+                var capacity = data['result']['value'];
+                var balance = parseFloat(capacity);
+                CustomSpinner.stop();
+                if (balance <= 0) {
+                    alert("Doesn't have enough balance");
+                } else {
+                    showOfferDialog(formatedData, capacity, urlData, item);
+                }
+            },
+            error: function(message) {
+                alert('get balance failed');
+                CustomSpinner.stop();
+            }
+        });
+    }
+
+    function showOfferDialog(formatedData, capacity, urlData, item) {
+        var balance = parseFloat(capacity);
+        var getsValue = parseFloat(formatedData['getsValue']);
+        var iPaysValue = balance > getsValue ? getsValue : balance;
+        var msg = '';
+        msg += formatedData['paysValue'] + ' / ' + formatedData['paysCurrency']+ '  (I Gets)\n';
+        msg += formatedData['getsValue'] + ' / ' + formatedData['getsCurrency'] + '  (I Pays)\n';
+        msg += formatedData['quality'] + '  (Quality)\n';
+        msg += balance + '  ( '+ formatedData['getsCurrency'] +'/balance)\n';
+        msg += 'I should pays max (' + iPaysValue + ')\n';
+        msg += formatedData['getsCurrency'] + ': \n';
+
+        iPaysValue = prompt(msg, iPaysValue);
+
+        if (iPaysValue != null && iPaysValue != "" && iPaysValue > 0) {
+            paysValue = parseFloat(iPaysValue);
+            formatedData['getsValue'] = paysValue;
+            formatedData['paysValue'] = paysValue * formatedData['quality'];
+            urlData = convertJsonToOfferData(formatedData);
             CustomSpinner.play();
             $.ajax({
                 url: '/books/offercreate',
@@ -103,17 +147,37 @@
                 json: "callback",
                 data: urlData,
                 success: function(data) {
-                    CustomSpinner.stop();
+                    refreshBookList(item);
                     alert(JSON.stringify(data['status']));
+                    CustomSpinner.stop();
                 },
-                error: function(message) {CustomSpinner.stop();}
+                error: function(message) {
+                    CustomSpinner.stop();
+                }
             });
         }
     }
 
-    function getOfferMessage(rawData) {
-        var result = "Will create offer reverse for: \n";
-        return result + rawData;
+    function refreshBookList(bookItem) {
+        getBooksResult();
+    }
+
+    function convertOfferDataToJson(rawData) {
+        var ret = {};
+        var keyMapData = rawData.split('=');
+        ret['paysCurrency'] = keyMapData[1];
+        ret['paysIssuer'] = keyMapData[3];
+        ret['paysValue'] = keyMapData[5];
+        ret['getsCurrency'] = keyMapData[7];
+        ret['getsIssuer'] = keyMapData[9];
+        ret['getsValue'] = keyMapData[11];
+        ret['quality'] = keyMapData[13];
+        return ret;
+    }
+
+    function convertJsonToOfferData(rawData) {
+        var offerCreateData = 'paysCurrency=' + rawData['getsCurrency'] + '&paysIssuer=' + rawData['getsIssuer'] + '&paysValue=' + rawData['getsValue'] + '&getsCurrency=' + rawData['paysCurrency'] + '&getsIssuer=' + rawData['paysIssuer'] + '&getsValue=' + rawData['paysValue'] + '&quality=' + rawData['quality'];
+        return offerCreateData;
     }
 
     $(function() {
@@ -179,7 +243,6 @@
             <h2>Book list</h2>
         <div id="bookList">
         </div>
-        <div id="spinner"></div>
     </div>
 </body>
 
