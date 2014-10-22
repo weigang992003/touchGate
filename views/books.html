@@ -52,7 +52,7 @@
     }
 
     function getBooksResult() {
-        var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize();
+        var formData = $("#paysBookArgs").serialize() + "&" + $("#getsBookArgs").serialize() + "&isBookTab=true";
         CustomSpinner.play();
         $.ajax({
             url: '/books/getbooks',

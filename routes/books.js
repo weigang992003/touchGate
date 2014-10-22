@@ -57,6 +57,18 @@ router.get('/getbooks', function(req, res) {
     var getsCurrency = req.query.currencyGetsSelector;
     var paysCurrency = req.query.currencyPaysSelector;
 
+    var bookDeep = 3;
+    var isBookTab = false;
+    if (req.query.isBookTab !== undefined) {
+        isBookTab = req.query.isBookTab;
+    }
+
+    if (isBookTab) {
+        bookDeep = 2;
+    }
+
+    console.log('isBookTab: ' + isBookTab + ' ,bookDeep: ' + bookDeep);
+
     var paysCurrencyArray = new Array();
     var paysIssuersArray = new Array();
     var getsCurrencyArray = new Array();
@@ -75,11 +87,6 @@ router.get('/getbooks', function(req, res) {
         getsIssuersArray = getsIssuers;
     }
 
-    console.log(getsIssuersArray);
-    console.log(paysIssuersArray);
-    console.log(getsCurrencyArray);
-    console.log(paysCurrencyArray);
-
     wsbu.exeCmd({
         "cmd": "book",
         "params": {
@@ -88,18 +95,18 @@ router.get('/getbooks', function(req, res) {
             "gets_currency": getsCurrencyArray,
             "gets_issuer": getsIssuersArray
         },
-        "limit": 3,
+        "limit": bookDeep,
         "filter": 0,
         "cache": 0
     }, function(orders) {
         res.json({
-            books: formatOrder(orders)
+            books: formatOrder(orders, isBookTab)
         });
     });
 
 });
 
-function formatOrder(rawOrders) {
+function formatOrder(rawOrders, isBookTab) {
     var len = rawOrders.length;
     var ret = new Array();
     for (var i = 0; i < len; i++) {
@@ -127,9 +134,11 @@ function formatOrder(rawOrders) {
             item['getsDomain'] = 'XRP';
         }
 
-
         ret.push(item);
     };
+
+    if (isBookTab)
+        return ret;
 
     var sorted = ret.sort(function(a, b) {
         return a['quality'] - b['quality'];
@@ -206,6 +215,5 @@ router.get('/getBalance', function(req, res) {
         });
     });
 });
-
 
 module.exports = router;
