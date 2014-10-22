@@ -163,6 +163,7 @@
     }
 
     function convertOfferDataToJson(rawData) {
+            var offerCreateData = 'paysCurrency=' + getsCurrency + '=paysIssuer=' + getsIssuer + '=paysValue=' + getsValue + '=getsCurrency=' + paysCurrency + '=getsIssuer=' + paysIssuer + '=getsValue=' + paysValue + '=quality=' + qualityNew;
         var ret = {};
         var keyMapData = rawData.split('=');
         ret['paysCurrency'] = keyMapData[1];
