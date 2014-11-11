@@ -36,6 +36,7 @@ function createTable(data) {
 }
 
 function startWebSocket() {
+    CustomSpinner.play();
     if (websocket) websocket.close();
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(result) {
@@ -53,6 +54,7 @@ function startWebSocket() {
 }
 
 function onOpen(result) {
+    CustomSpinner.stop();
     sendLedgerRequest(currentIndex);
 }
 
