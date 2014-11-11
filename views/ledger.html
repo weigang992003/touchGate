@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8'>
+
+    <title>Kissingate</title>
+
+    <link href='/stylesheets/bootstrap.min.css' rel='stylesheet'>
+    <link href='/stylesheets/home.css' rel='stylesheet'>
+    <link href='/stylesheets/tablestyle.css' rel='stylesheet' />
+</head>
+
+<body>
+    <% include navbar.html %>
+    <% include spinner.html %>
+    <div id='container' class='container'>
+        <p>Ledger Index:
+            <input id='ledgerIndex' type='number' value='9000000'></input>
+            <input name="" type="button" value="Submit" onClick="getResult()" />
+        </p>
+        <br>
+        <div>
+            <h4 id='ledgerStatus'></h4>
+        </div>
+        <br>
+        <div id='offersDiv'>
+        </div>
+    </div>
+    <script src='/javascripts/ledger.js'></script>
+</body>
+
+</html>

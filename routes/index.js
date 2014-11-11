@@ -22,4 +22,7 @@ router.get('/about', function(req, res) {
     res.render('about');
 });
 
+router.get('/ledger', function(req, res) {
+    res.render('ledger');
+});
 module.exports = router;
