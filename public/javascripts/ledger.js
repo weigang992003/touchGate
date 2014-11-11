@@ -60,6 +60,7 @@ function onOpen(result) {
 
 function onError(result) {
     console.log(result.data);
+    CustomSpinner.stop();
     websocket.close();
     websocket = null;
 }
