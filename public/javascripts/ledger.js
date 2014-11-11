@@ -91,13 +91,15 @@ function processLedger(data) {
     var ret = [];
     txs.forEach(function(tx) {
         var item;
-        if (tx.TransactionType === 'OfferCreate')
+        if (tx.TransactionType === 'OfferCreate') {
             item = processOfferCreateTx(tx);
-        else if (tx.TransactionType === 'OfferCancel')
+        } else if (tx.TransactionType === 'OfferCancel') {
             item = processOfferCancelTx(tx);
-        else if (tx.TransactionType === 'Payment')
-            item = processPaymentTx(tx);
-        else
+        } else if (tx.TransactionType === 'Payment') {
+            var items = processPaymentTx(tx);
+            if (items !== null)
+                ret = ret.concat(items);
+        } else
             item = null;
         if (item)
             ret.push(item);
@@ -112,6 +114,8 @@ function processOfferCreateTx(tx) {
 }
 
 function processOfferCancelTx(tx) {
+    if (tx.metaData.TransactionResult !== 'tesSUCCESS')
+        return null;
     for (var i = tx.metaData.AffectedNodes.length - 1; i >= 0; i--) {
         var affNode = tx.metaData.AffectedNodes[i]
         var node = affNode.DeletedNode;
@@ -129,7 +133,57 @@ function processOfferCancelTx(tx) {
 }
 
 function processPaymentTx(tx) {
-    return null;
+    if (tx.metaData.TransactionResult !== 'tesSUCCESS')
+        return null;
+
+    var ret = [];
+
+    for (var i = tx.metaData.AffectedNodes.length - 1; i >= 0; i--) {
+        var affNode = tx.metaData.AffectedNodes[i]
+        var node = affNode.DeletedNode || affNode.ModifiedNode;
+        var account;
+
+        if (!node || node.LedgerEntryType !== 'Offer') {
+            continue;
+        }
+
+        if (!node.FinalFields || !node.FinalFields.TakerPays || !node.FinalFields.TakerGets || !node.PreviousFields) {
+            continue;
+        }
+
+        account = node.FinalFields.Account;
+
+        if (typeof node.PreviousFields.TakerPays === 'object') {
+            payCurr = node.PreviousFields.TakerPays.currency;
+            payAmnt = node.PreviousFields.TakerPays.value - node.FinalFields.TakerPays.value;
+            payIssuer = getIssuerName(node.PreviousFields.TakerPays.issuer);
+        } else {
+            payCurr = 'XRP';
+            payAmnt = (node.PreviousFields.TakerPays - node.FinalFields.TakerPays) / 1000000.0;
+            payIssuer = 'XRP';
+        }
+
+        if (typeof node.PreviousFields.TakerGets === 'object') {
+            getCurr = node.PreviousFields.TakerGets.currency;
+            getAmnt = node.PreviousFields.TakerGets.value - node.FinalFields.TakerGets.value;
+            getIssuer = getIssuerName(node.PreviousFields.TakerGets.issuer);
+        } else {
+            getCurr = 'XRP';
+            getAmnt = (node.PreviousFields.TakerGets - node.FinalFields.TakerGets) / 1000000.0;
+            getIssuer = 'XRP';
+        }
+
+        ret.push(makeTableItem({
+            currency: getCurr,
+            value: getAmnt,
+            issuer: getIssuer
+        }, {
+            currency: payCurr,
+            value: payAmnt,
+            issuer: payIssuer
+        }, account, 'Payment'));
+    };
+    return ret;
 }
 
 function makeTableItem(takerGets, takerPays, account, txType) {
@@ -166,6 +220,8 @@ function makeTableItem(takerGets, takerPays, account, txType) {
     item += '<td>' + account + '</td>';
     if (txType === 'OfferCancel')
         item += '<td bgcolor="#FF0000">' + txType + '</td>';
+    else if (txType === 'Payment')
+        item += '<td bgcolor="#00FF00">' + txType + '</td>';
     else
         item += '<td>' + txType + '</td>';
     item += '<td>' + paysValue / getsValue + '</td>';
