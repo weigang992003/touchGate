@@ -78,6 +78,7 @@ function onMessage(result) {
         writeResultStatus('Get ledger faild');
         return;
     }
+
     switch (data.id) {
         case 1:
             processLedger(data);
@@ -89,7 +90,7 @@ function onMessage(result) {
 
 function processLedger(data) {
     console.log('on processLedger');
-    console.log(data.result.ledger.transactions);
+    writeResultStatus('Ledger Close time: ' + data.result.ledger.close_time + ', close human time: ' + data.result.ledger.close_time_human);
     var txs = data.result.ledger.transactions;
     var ret = [];
     txs.forEach(function(tx) {
