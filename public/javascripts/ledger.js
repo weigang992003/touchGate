@@ -114,7 +114,7 @@ function processLedger(data) {
 function processOfferCreateTx(tx) {
     if (tx.TakerGets === undefined)
         return null;
-    return makeTableItem(tx.TakerGets, tx.TakerPays, tx.Account, 'OfferCreate');
+    return makeTableItem(tx.TakerGets, tx.TakerPays, tx.Account, tx.TransactionType, tx);
 }
 
 function processOfferCancelTx(tx) {
@@ -132,7 +132,7 @@ function processOfferCancelTx(tx) {
             continue;
         }
 
-        return makeTableItem(node.FinalFields.TakerGets, node.FinalFields.TakerPays, tx.Account, tx.TransactionType);
+        return makeTableItem(node.FinalFields.TakerGets, node.FinalFields.TakerPays, tx.Account, tx.TransactionType, tx);
     };
 }
 
@@ -185,12 +185,12 @@ function processPaymentTx(tx) {
             currency: payCurr,
             value: payAmnt,
             issuer: payIssuer
-        }, account, 'Payment'));
+        }, account, 'Payment', tx));
     };
     return ret;
 }
 
-function makeTableItem(takerGets, takerPays, account, txType) {
+function makeTableItem(takerGets, takerPays, account, txType, tx) {
     var item = '<tr>';
     var currency = '';
     var value = '';
@@ -220,7 +220,13 @@ function makeTableItem(takerGets, takerPays, account, txType) {
         getsValue = takerGets.value;
     }
     item += '<td>' + currency + value + issuer + '</td>';
-    item += '<td></td>';
+    if (txType === 'OfferCreate') {
+        item += getReallyTradeValue(tx);
+    } else if (txType === 'OfferCancel') {
+        item += '<td>0 -> 0</td>';
+    } else {
+        item += '<td>' + currency + value + '</td>';
+    }
     item += '<td>' + account + '</td>';
     if (txType === 'OfferCancel')
         item += '<td bgcolor="#FF0000">' + txType + '</td>';
@@ -237,10 +243,10 @@ function makeTableItem(takerGets, takerPays, account, txType) {
 function getReallyTradeValue(tx) {
     var payCurr,
         payIssuer,
-        payAmnt,
+        payAmnt = 0,
         getCurr,
         getIssuer,
-        getAmnt;
+        getAmnt = 0;
 
     tx.metaData.AffectedNodes.forEach(function(affNode) {
         var node = affNode.ModifiedNode || affNode.DeletedNode;
@@ -255,27 +261,30 @@ function getReallyTradeValue(tx) {
 
         if (typeof node.PreviousFields.TakerPays === 'object') {
             payCurr = node.PreviousFields.TakerPays.currency;
-            payAmnt = node.PreviousFields.TakerPays.value - node.FinalFields.TakerPays.value;
+            payAmnt += node.PreviousFields.TakerPays.value - node.FinalFields.TakerPays.value;
             payIssuer = getIssuerName(node.PreviousFields.TakerPays.issuer);
         } else {
             payCurr = 'XRP';
-            payAmnt = (node.PreviousFields.TakerPays - node.FinalFields.TakerPays) / 1000000.0;
+            payAmnt += (node.PreviousFields.TakerPays - node.FinalFields.TakerPays) / 1000000.0;
             payIssuer = 'XRP';
         }
 
         if (typeof node.PreviousFields.TakerGets === 'object') {
             getCurr = node.PreviousFields.TakerGets.currency;
-            getAmnt = node.PreviousFields.TakerGets.value - node.FinalFields.TakerGets.value;
+            getAmnt += node.PreviousFields.TakerGets.value - node.FinalFields.TakerGets.value;
             getIssuer = getIssuerName(node.PreviousFields.TakerGets.issuer);
         } else {
             getCurr = 'XRP';
-            getAmnt = (node.PreviousFields.TakerGets - node.FinalFields.TakerGets) / 1000000.0;
+            getAmnt += (node.PreviousFields.TakerGets - node.FinalFields.TakerGets) / 1000000.0;
             getIssuer = 'XRP';
         }
-        console.log('getReallyTradeValue begin');
         console.log('payCurr:' + payCurr + '/payIssuer:' + payIssuer + '/payAmnt:' + payAmnt + '/getCurr:' + getCurr + '/getIssuer:' + getIssuer + '/getAmnt:' + getAmnt);
-        console.log('getReallyTradeValue end');
     });
+
+    if (payCurr !== undefined)
+        return '<td>' + payCurr + ' -> ' + getCurr + '<br>' + +payAmnt + ' -> ' + getAmnt + '</td>';
+    else
+        return '<td>0 -> 0</td>';
 }
 
 function getIssuerName(issuer) {
